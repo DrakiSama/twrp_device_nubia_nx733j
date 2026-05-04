@@ -1,5 +1,5 @@
 # Android fstab file.
-# Device: Nubia RedMagic 10 Pro (NX789J)
+# Device: Nubia Z70 Ultra 10 (NX733J)
 # Platform: Snapdragon 8 Elite (sun) / Android 15
 # Encryption: ICE wrappedkey / FBE policy 2
 
@@ -33,5 +33,5 @@ odm_dlkm                                                 /odm_dlkm     ext4     
 /dev/block/bootdevice/by-name/persist                    /persist      ext4     noatime,nosuid,nodev,barrier=1                                                                                                             wait
 /dev/block/bootdevice/by-name/modem                      /firmware     vfat     ro,shortname=lower,uid=1000,gid=1000,dmask=227,fmask=337,context=u:object_r:firmware_file:s0                                               wait
 
-# USB OTG (no microSD slot on NX789J)
+# USB OTG (no microSD slot on NX733J)
 /devices/platform/soc/a600000.ssusb/*.dwc3/xhci-hcd.*.auto*   /usbotg   auto   nosuid,nodev                                                                                                                               wait,voldmanaged=usbotg:auto

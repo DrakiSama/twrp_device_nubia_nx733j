@@ -4,23 +4,23 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-DEVICE_PATH := device/nubia/NX789J
+DEVICE_PATH := device/nubia/NX733J
 
 # Inherit from device.mk configuration
 $(call inherit-product, $(DEVICE_PATH)/device.mk)
 
 # Device identifier
-PRODUCT_DEVICE := NX789J
-PRODUCT_NAME := twrp_NX789J
+PRODUCT_DEVICE := NX733J
+PRODUCT_NAME := twrp_NX733J
 PRODUCT_BRAND := nubia
 PRODUCT_MANUFACTURER := nubia
-PRODUCT_MODEL := RedMagic 10 Pro
+PRODUCT_MODEL := Nubia Z70 Ultra
 
 # Assert
-TARGET_OTA_ASSERT_DEVICE := NX789J
+TARGET_OTA_ASSERT_DEVICE := NX733J
 
 # Fingerprint
-BUILD_FINGERPRINT := nubia/NX789J-UN/NX789J:15/AQ3A.240812.002/RedMagicOS10.0.15_NX789J_GB:user/release-keys
+BUILD_FINGERPRINT := nubia/CN_PQ84A01/PQ84A01:15/AQ3A.240812.002/20251209.173802:user/release-keys
 
 # Theme
 TW_STATUS_ICONS_ALIGN := center

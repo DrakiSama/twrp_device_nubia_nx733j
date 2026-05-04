@@ -1,4 +1,4 @@
-name: TWRP 16 Builder - NX789J
+name: TWRP 16 Builder - NX733J
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ on:
       DEVICE_TREE_URL:
         description: "Device tree url"
         required: true
-        default: "https://github.com/reminon/twrp_device_nubia_nx789j"
+        default: "https://github.com/kindle4jerry/twrp_device_nubia_nx733j"
       DEVICE_TREE_BRANCH:
         description: "Device tree branch"
         required: true
@@ -22,11 +22,11 @@ on:
       DEVICE_PATH:
         description: "Device path device/"
         required: true
-        default: "nubia/nx789j"
+        default: "nubia/nx733j"
       DEVICE_NAME:
         description: "Device name"
         required: true
-        default: "nx789j"
+        default: "nx733j"
       LUNCH_TARGET:
         description: "lunch twrp_ (default same as device name)"
         required: false

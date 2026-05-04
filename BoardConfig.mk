@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-DEVICE_PATH := device/nubia/NX789J
+DEVICE_PATH := device/nubia/NX733J
 
 # Building with minimal manifest
 ALLOW_MISSING_DEPENDENCIES := true
@@ -176,9 +176,10 @@ TW_DEFAULT_BRIGHTNESS := 250
 TW_EXTRA_LANGUAGES := true
 TW_EXCLUDE_APEX := true
 TW_HAS_EDL_MODE := false
-TW_SUPPORT_INPUT_AIDL_HAPTICS := true
-TW_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "android.hardware.vibrator.IVibrator/vibratorfeature"
-TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
+#TW_SUPPORT_INPUT_AIDL_HAPTICS := true
+#TW_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "android.hardware.vibrator.IVibrator/vibratorfeature"
+#TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
+TW_NO_HAPTICS :=true
 TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_LOAD_VENDOR_MODULES := "drm_display_helper.ko msm_drm.ko panel_event_notifier.ko zte_tpd.ko smartpa_stat_dlkm.ko aw882xx_dlkm.ko aw9620x.ko"

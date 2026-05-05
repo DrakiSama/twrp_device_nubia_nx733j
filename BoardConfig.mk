@@ -38,14 +38,29 @@ TARGET_BOARD_PLATFORM := sun
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno830
 QCOM_BOARD_PLATFORMS += sun
 
-# Kernel
+# Kernel — compilado desde source oficial NX733J (android15-6.6.30)
+# Source layout esperado en el árbol TWRP:
+#   kernel/nubia/nx733j/msm-kernel/  ← kernel_platform/msm-kernel
+#   kernel/nubia/nx733j/common/      ← kernel_platform/common
+# Clang: r510928 (build.config.constants)
+# Variante: perf → gki_defconfig + vendor/sun_perf.config
 TARGET_KERNEL_ARCH := arm64
 TARGET_KERNEL_HEADER_ARCH := arm64
 BOARD_KERNEL_IMAGE_NAME := Image
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_KERNEL_PAGESIZE := 4096
+
+# Clang/LLVM completo (LLVM=1 definido en build.config.common del source oficial)
 TARGET_KERNEL_CLANG_COMPILE := true
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
+TARGET_KERNEL_CLANG_VERSION := r510928
+TARGET_KERNEL_ADDITIONAL_FLAGS := LLVM=1 LLVM_IAS=1
+
+# Source del kernel
+TARGET_KERNEL_SOURCE := kernel/nubia/nx733j/msm-kernel
+TARGET_KERNEL_CONFIG := gki_defconfig
+# Fragmento perf aplicado encima de gki_defconfig (build.config.msm.perf)
+TARGET_KERNEL_CONFIG += vendor/sun_perf.config
+
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
 BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
@@ -80,7 +95,13 @@ BOARD_AVB_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_ROLLBACK_INDEX_LOCATION := 1
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 
-# Partitions
+# Partitions — tamaños verificados con "fastboot getvar" en NX733J real (PQ84A01)
+BOARD_BOOTIMAGE_PARTITION_SIZE        := 100663296   # 0x06000000
+BOARD_INIT_BOOT_IMAGE_PARTITION_SIZE  := 8388608     # 0x00800000
+BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296   # 0x06000000
+BOARD_DTBOIMG_PARTITION_SIZE          := 25165824    # 0x01800000
+BOARD_RECOVERYIMAGE_PARTITION_SIZE    := 104857600   # 0x06400000
+
 BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
 
 TARGET_COPY_OUT_VENDOR := vendor
@@ -90,15 +111,10 @@ BOARD_USES_VENDOR_DLKMIMAGE := true
 TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
 BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
 
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
-BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
-BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
-BOARD_DTBOIMG_PARTITION_SIZE := 25165824
-BOARD_INIT_BOOT_IMAGE_PARTITION_SIZE := 8388608
-
-# Dynamic Partitions
+# Dynamic Partitions — super verificado: 0x400000000 = 17179869184 bytes (16 GB)
 BOARD_SUPER_PARTITION_SIZE := 17179869184
 BOARD_SUPER_PARTITION_GROUPS := nubia_dynamic_partitions
+# Reservar ~4 MB para metadata del super
 BOARD_NUBIA_DYNAMIC_PARTITIONS_SIZE := 17175674880
 BOARD_NUBIA_DYNAMIC_PARTITIONS_PARTITION_LIST := \
     system \
@@ -121,13 +137,14 @@ BOARD_HAS_LARGE_FILESYSTEM := true
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
 
-# Crypto
+# Crypto — FBE completo para Android 15/16 con fscrypt policy v2
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
 BOARD_USES_QCOM_FBE_DECRYPTION := true
 BOARD_USES_METADATA_PARTITION := true
 TW_USE_FSCRYPT_POLICY := 2
+# Bypass de verificación de versión — permite que TWRP descifre ROMs futuras
 PLATFORM_VERSION := 99.87.36
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 PLATFORM_SECURITY_PATCH := 2099-12-31
@@ -176,12 +193,10 @@ TW_DEFAULT_BRIGHTNESS := 250
 TW_EXTRA_LANGUAGES := true
 TW_EXCLUDE_APEX := true
 TW_HAS_EDL_MODE := false
-#TW_SUPPORT_INPUT_AIDL_HAPTICS := true
-#TW_SUPPORT_INPUT_AIDL_HAPTICS_FQNAME := "android.hardware.vibrator.IVibrator/vibratorfeature"
-#TW_SUPPORT_INPUT_AIDL_HAPTICS_FIX_OFF := true
-TW_NO_HAPTICS :=true
+TW_NO_HAPTICS := true
 TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
 TW_SCREEN_BLANK_ON_BOOT := true
+# Módulos de vendor requeridos para display, touch y audio (Nubia/ZTE sun platform)
 TW_LOAD_VENDOR_MODULES := "drm_display_helper.ko msm_drm.ko panel_event_notifier.ko zte_tpd.ko smartpa_stat_dlkm.ko aw882xx_dlkm.ko aw9620x.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_LOAD_PREBUILT_MODULES_AT_FIRST := true
@@ -189,3 +204,6 @@ TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone1/temp"
 TW_BACKUP_EXCLUSIONS := /data/fonts
 TW_HAS_USB_OTG := true
 TW_CUSTOM_BATTERY_PATH := "/sys/class/power_supply/battery"
+
+# Nota: ro.product.device = PQ84A01 (codename interno Nubia del NX733J)
+# fingerprint real: nubia/PQ84A01-UN/PQ84A01:16/BQ2A.250705.001/20260210.135030:user/release-keys

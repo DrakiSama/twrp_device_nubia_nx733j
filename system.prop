@@ -1,15 +1,137 @@
+# system.prop — Nubia Z70 Ultra (NX733J / PQ84A01)
+# Android 16 / SDK 36 / Snapdragon 8 Elite (sun)
+
+# ============================================================
 # ADB
+# ============================================================
 ro.adb.secure=0
+
+# ============================================================
+# A/B & Dynamic Partitions
+# ============================================================
+ro.build.ab_update=true
 ro.boot.dynamic_partitions=true
 
-# Gatekeeper
-# vendor.gatekeeper.disable_spu=true
-# vendor.gatekeeper.is_security_level_spu=0
-
-# Battery Property
+# ============================================================
+# Battery / Charger
+# ============================================================
 ro.charger.enable_suspend=1
 
+# ============================================================
 # USB
+# ============================================================
 vendor.usb.configfs=1
 vendor.usb.rps_mask=0
 vendor.usb.uvc.function.init=1
+ro.boot.usbcontroller=a600000.dwc3
+
+# ============================================================
+# Gatekeeper (descomenta si tienes problemas de decrypt)
+# ============================================================
+# vendor.gatekeeper.disable_spu=true
+# vendor.gatekeeper.is_security_level_spu=0
+
+# ============================================================
+# Platform / Hardware
+# ============================================================
+ro.board.platform=sun
+ro.hardware=qcom
+ro.product.board=sun
+ro.boot.product.vendor.sku=sun
+ro.hardware.egl=adreno
+ro.hardware.vulkan=adreno
+ro.hardware.consumerir=zte
+
+# ============================================================
+# Product identity
+# ============================================================
+ro.product.brand=nubia
+ro.product.device=PQ84A01
+ro.product.manufacturer=nubia
+ro.product.model=NX733J
+ro.product.name=PQ84A01-UN
+ro.vendor.product.ztename=nubia Z70 Ultra
+ro.vendor.product.ztemodel=NX733J
+
+# ============================================================
+# Build fingerprint
+# ============================================================
+ro.build.fingerprint=nubia/PQ84A01-UN/PQ84A01:16/BQ2A.250705.001-BP2A.250605.031.A3/20260210.135030:user/release-keys
+ro.build.id=BQ2A.250705.001-BP2A.250605.031.A3
+ro.build.version.release=16
+ro.build.version.sdk=36
+ro.build.version.security_patch=2026-02-01
+ro.build.characteristics=nosdcard
+
+# Vendor fingerprint (vendor está en Android 15)
+ro.vendor.build.fingerprint=nubia/PQ84A01-UN/PQ84A01:15/AQ3A.240812.002/20260210.011420:user/release-keys
+ro.vendor.build.security_patch=2025-12-01
+ro.vendor.build.version.release=15
+ro.vendor.build.version.sdk=35
+
+# ============================================================
+# Boot device / UFS
+# ============================================================
+ro.boot.bootdevice=1d84000.ufshc
+ro.boot.boot_devices=soc/1d84000.ufshc
+
+# ============================================================
+# Display
+# ============================================================
+ro.sf.lcd_density=520
+ro.vendor.feature.lcd_type=oled
+
+# ============================================================
+# Crypto / FBE
+# ============================================================
+ro.crypto.state=encrypted
+ro.crypto.type=file
+ro.crypto.metadata.enabled=true
+
+# ============================================================
+# Board API
+# ============================================================
+ro.board.api_level=202404
+ro.board.first_api_level=202404
+ro.board.api_frozen=true
+ro.product.first_api_level=35
+ro.product.shipping_api_level=35
+ro.vendor.api_level=202404
+
+# ============================================================
+# ART / Dalvik — tuning del dispositivo real (oryon)
+# ============================================================
+dalvik.vm.isa.arm64.variant=oryon
+dalvik.vm.isa.arm64.features=default
+dalvik.vm.heapsize=512m
+dalvik.vm.heapstartsize=16m
+dalvik.vm.heapgrowthlimit=256m
+dalvik.vm.heapminfree=8m
+dalvik.vm.heapmaxfree=32m
+dalvik.vm.heaptargetutilization=0.5
+dalvik.vm.dex2oat-threads=4
+dalvik.vm.dex2oat-cpu-set=0,1,2,6
+dalvik.vm.dex2oat-Xms=64m
+dalvik.vm.dex2oat-Xmx=512m
+dalvik.vm.image-dex2oat-Xms=64m
+dalvik.vm.image-dex2oat-Xmx=64m
+dalvik.vm.dex2oat64.enabled=true
+dalvik.vm.dex2oat-minidebuginfo=true
+dalvik.vm.dex2oat-resolve-startup-strings=true
+dalvik.vm.dex2oat-max-image-block-size=524288
+dalvik.vm.appimageformat=lz4
+dalvik.vm.usejit=true
+dalvik.vm.useartservice=true
+ro.dalvik.vm.enable_uffd_gc=true
+
+# ============================================================
+# Qualcomm perf
+# ============================================================
+ro.vendor.perf.scroll_opt=1
+ro.vendor.qti.va_aosp.support=1
+ro.vendor.qti.va_odm.support=1
+
+# ============================================================
+# Fuse passthrough (Android 15+)
+# ============================================================
+persist.sys.fuse.passthrough.enable=true

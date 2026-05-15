@@ -55,11 +55,17 @@ TARGET_KERNEL_CLANG_COMPILE := true
 TARGET_KERNEL_CLANG_VERSION := r510928
 TARGET_KERNEL_ADDITIONAL_FLAGS := LLVM=1 LLVM_IAS=1
 
-# Source del kernel
+# Kernel source — compila desde source si está disponible, sino usa prebuilt
+# Source esperado en: kernel/nubia/nx733j/msm-kernel/ (copiar desde NX733J_V(15)_Kernel(6.6.30))
+ifneq ($(wildcard kernel/nubia/nx733j/msm-kernel/Makefile),)
 TARGET_KERNEL_SOURCE := kernel/nubia/nx733j/msm-kernel
 TARGET_KERNEL_CONFIG := gki_defconfig
-# Fragmento perf aplicado encima de gki_defconfig (build.config.msm.perf)
 TARGET_KERNEL_CONFIG += vendor/sun_perf.config
+$(info Building kernel from source: $(TARGET_KERNEL_SOURCE))
+else
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
+$(info Kernel source not found, using prebuilt: $(TARGET_PREBUILT_KERNEL))
+endif
 
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
@@ -196,8 +202,9 @@ TW_HAS_EDL_MODE := false
 TW_NO_HAPTICS := true
 TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
 TW_SCREEN_BLANK_ON_BOOT := true
-# Módulos de vendor requeridos para display, touch y audio (Nubia/ZTE sun platform)
-TW_LOAD_VENDOR_MODULES := "drm_display_helper.ko msm_drm.ko panel_event_notifier.ko zte_tpd.ko smartpa_stat_dlkm.ko aw882xx_dlkm.ko aw9620x.ko"
+# Módulos de vendor requeridos para display, touch y battery (Nubia/ZTE sun platform)
+# Verificados contra kernel source NX733J V(15) y vendor_boot stock
+TW_LOAD_VENDOR_MODULES := "msm.ko drm_display_helper.ko panel_event_notifier.ko dispcc-sun.ko gpucc-sun.ko zte_tpd.ko aw9620x.ko qti_battery_charger.ko zte_power_supply.ko bcl_pmic5.ko bcl_soc.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_LOAD_PREBUILT_MODULES_AT_FIRST := true
 TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone1/temp"

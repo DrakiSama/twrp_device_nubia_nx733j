@@ -5,6 +5,7 @@
 #
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/twrp_NX733J.mk
+
 COMMON_LUNCH_CHOICES := \
-    twrp_NX733J-ap3a-eng \
-    twrp_NX733J-ap3a-userdebug
+    twrp_NX733J-eng \
+    twrp_NX733J-userdebug

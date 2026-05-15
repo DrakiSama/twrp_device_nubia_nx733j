@@ -622,3 +622,7 @@ subsystem mem_buf_vm
 
 # IPA Events
 /dev/ipa_events         0660   radio      radio
+
+# Touch (Goodix THP)
+/dev/thp             0666   system     system
+/dev/input_agent     0666   system     system

@@ -65,24 +65,26 @@ on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=tru
     start odm.prepdecrypt
 
 on property:twrp.variant.files_copied=1
-    start odm.vibratorfeature-service
-    start odm.touch_report
-    start odm.weaver-service
-    start odm.keymint-strongbox
-    start odm.se_omapi
+    # touch daemon (definido en vendor/etc/init/touchscreen_zte.rc)
+    start ztethp
+    # weaver está declarado en el manifest, service en odm — si falla no es crítico
+    # start odm.weaver-service
+    # start odm.keymint-strongbox
+    # start odm.se_omapi
 
 on property:servicemanager.ready=true
     setprop sys.boot_completed 1
-on post-fs-data
-    start vendor.qti.vibrator
-
-service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
-    class hal
-    user system
-    group system input
-    setenv RICHTAP_DEVICE_PATH /dev/awinic_haptic
-    setenv ENV_RICHTAP_CONFIG_PATH /odm/etc/aac_richtap.config
-    seclabel u:r:recovery:s0
+# vendor.qti.vibrator deshabilitado — TW_NO_HAPTICS := true, causa touch lag severo
+# on post-fs-data
+#     start vendor.qti.vibrator
+#
+# service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
+#     class hal
+#     user system
+#     group system input
+#     setenv RICHTAP_DEVICE_PATH /dev/awinic_haptic
+#     setenv ENV_RICHTAP_CONFIG_PATH /odm/etc/aac_richtap.config
+#     seclabel u:r:recovery:s0
 
 on post-fs
     write /sys/kernel/fan/fan_enable 1

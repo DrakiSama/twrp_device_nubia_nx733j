@@ -3,5 +3,5 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
-# Prebuilt kernel is declared via TARGET_PREBUILT_KERNEL in BoardConfig.mk
-# No additional prebuilt artifacts for NX733J
+# Prebuilt kernel y DTBO para NX733J
+# Se usan solo si kernel source no está disponible (ver BoardConfig.mk)

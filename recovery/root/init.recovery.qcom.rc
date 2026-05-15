@@ -58,7 +58,10 @@ on property:twrp.modules.loaded=true
     write /sys/kernel/boot_adsp/ssr 1
     wait /sys/class/power_supply/battery
     start vendor.health-default
-    umount /vendor
+    start vendor.charger
+    # vendor debe quedar montado para los servicios HAL (health, boot, etc.)
+    # si se necesita modificar vendor, twrp lo remonta RW
+    # umount /vendor
     symlink /firmware /vendor/firmware_mnt
 
 on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=true

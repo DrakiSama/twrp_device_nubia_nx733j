@@ -47,8 +47,9 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery.fstab:$(TARGET_VENDOR_RAMDISK_OUT)/first_stage_ramdisk/fstab.sun \
     $(DEVICE_PATH)/recovery/root/vendor/etc/vintf/manifest.xml:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/etc/vintf/manifest.xml
 
-# Init scripts + twrp flags
+# Init scripts + twrp flags + vendor_dlkm mount
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc \
     $(DEVICE_PATH)/recovery/root/init.recovery.usb.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.usb.rc \
-    $(DEVICE_PATH)/recovery/root/twrp.flags:$(TARGET_COPY_OUT_RECOVERY)/root/twrp.flags
+    $(DEVICE_PATH)/recovery/root/twrp.flags:$(TARGET_COPY_OUT_RECOVERY)/root/twrp.flags \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/mount_vendor_dlkm.sh:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/mount_vendor_dlkm.sh

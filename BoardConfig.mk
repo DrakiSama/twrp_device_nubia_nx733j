@@ -211,6 +211,7 @@ TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone1/temp"
 TW_BACKUP_EXCLUSIONS := /data/fonts
 TW_HAS_USB_OTG := true
 TW_CUSTOM_BATTERY_PATH := "/sys/class/power_supply/battery"
+TW_DEVICE_VERSION := "by Draki"
 
 # Nota: ro.product.device = PQ84A01 (codename interno Nubia del NX733J)
 # fingerprint real: nubia/PQ84A01-UN/PQ84A01:16/BQ2A.250705.001/20260210.135030:user/release-keys

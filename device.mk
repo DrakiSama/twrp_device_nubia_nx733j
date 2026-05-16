@@ -54,4 +54,5 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/twrp.flags:$(TARGET_COPY_OUT_RECOVERY)/root/twrp.flags \
     $(DEVICE_PATH)/recovery/root/twrp.flags:$(TARGET_COPY_OUT_RECOVERY)/root/etc/twrp.flags \
     $(DEVICE_PATH)/recovery/root/twrp.flags:$(TARGET_COPY_OUT_RECOVERY)/root/system/etc/twrp.flags \
-    $(DEVICE_PATH)/recovery/root/vendor/bin/mount_vendor_dlkm.sh:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/mount_vendor_dlkm.sh
+    $(DEVICE_PATH)/recovery/root/vendor/bin/mount_vendor_dlkm.sh:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/mount_vendor_dlkm.sh \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/set_branding.sh:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/set_branding.sh

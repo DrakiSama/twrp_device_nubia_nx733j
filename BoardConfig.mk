@@ -61,10 +61,8 @@ ifneq ($(wildcard kernel/nubia/nx733j/msm-kernel/Makefile),)
 TARGET_KERNEL_SOURCE := kernel/nubia/nx733j/msm-kernel
 TARGET_KERNEL_CONFIG := gki_defconfig
 TARGET_KERNEL_CONFIG += vendor/sun_perf.config
-$(info Building kernel from source: $(TARGET_KERNEL_SOURCE))
 else
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
-$(info Kernel source not found, using prebuilt: $(TARGET_PREBUILT_KERNEL))
 endif
 
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/prebuilt/dtbo.img

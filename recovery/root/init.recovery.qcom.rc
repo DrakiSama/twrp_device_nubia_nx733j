@@ -47,52 +47,37 @@ on fs
     mount none /tmp/persist /mnt/vendor/persist bind rec
 
 on boot
+    # ADB + root temprano
     setprop sys.usb.config adb
+    setprop service.adb.root 1
 
-# Montar vendor_dlkm para acceso a módulos del kernel (batería, display, touch)
-# En GKI 2.0 los módulos vendor pueden estar en vendor_dlkm en vez de vendor
+# vendor_dlkm mount + módulos + servicios
 on property:twrp.modules.loaded=true
     exec u:r:recovery:s0 -- /system/bin/sh /vendor/bin/mount_vendor_dlkm.sh
     exec u:r:recovery:s0 -- /system/bin/sh /vendor/bin/set_branding.sh
-    # Mount firmware
+    # Firmware modem
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
-    # Load ADSP firmware for PMIC
-    wait /sys/kernel/boot_adsp/ssr
+    # ADSP firmware para PMIC (timeout 3s — puede no existir en recovery)
+    wait /sys/kernel/boot_adsp/ssr 3
     write /sys/kernel/boot_adsp/ssr 1
-    # Esperar battery sysfs con timeout de 5s — si no aparece, igual seguir
+    # Battery HAL services
     start vendor.health-default
     start vendor.charger
-    wait /sys/class/power_supply/battery 5
-    # vendor debe quedar montado para los servicios HAL (health, boot, etc.)
-    # si se necesita modificar vendor, twrp lo remonta RW
-    # umount /vendor
+    # Firmware symlink
     symlink /firmware /vendor/firmware_mnt
 
 on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=true
     start odm.prepdecrypt
 
 on property:twrp.variant.files_copied=1
-    # touch daemon (definido en vendor/etc/init/touchscreen_zte.rc)
+    # touch daemon
     start ztethp
-    # weaver está declarado en el manifest, service en odm — si falla no es crítico
-    # start odm.weaver-service
-    # start odm.keymint-strongbox
-    # start odm.se_omapi
 
 on property:servicemanager.ready=true
     setprop sys.boot_completed 1
+
 # vendor.qti.vibrator deshabilitado — TW_NO_HAPTICS := true, causa touch lag severo
-# on post-fs-data
-#     start vendor.qti.vibrator
-#
-# service vendor.qti.vibrator /vendor/bin/hw/vendor.qti.hardware.vibrator.service
-#     class hal
-#     user system
-#     group system input
-#     setenv RICHTAP_DEVICE_PATH /dev/awinic_haptic
-#     setenv ENV_RICHTAP_CONFIG_PATH /odm/etc/aac_richtap.config
-#     seclabel u:r:recovery:s0
 
 on post-fs
     write /sys/kernel/fan/fan_enable 1

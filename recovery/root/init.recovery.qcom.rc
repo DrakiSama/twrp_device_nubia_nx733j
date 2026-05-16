@@ -53,6 +53,7 @@ on boot
 # En GKI 2.0 los módulos vendor pueden estar en vendor_dlkm en vez de vendor
 on property:twrp.modules.loaded=true
     exec u:r:recovery:s0 -- /system/bin/sh /vendor/bin/mount_vendor_dlkm.sh
+    exec u:r:recovery:s0 -- /system/bin/sh /vendor/bin/set_branding.sh
     # Mount firmware
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
@@ -74,8 +75,6 @@ on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=tru
 on property:twrp.variant.files_copied=1
     # touch daemon (definido en vendor/etc/init/touchscreen_zte.rc)
     start ztethp
-    # Branding — agrega "by Draki" al version string
-    exec u:r:recovery:s0 -- /vendor/bin/sh /vendor/bin/set_branding.sh
     # weaver está declarado en el manifest, service en odm — si falla no es crítico
     # start odm.weaver-service
     # start odm.keymint-strongbox

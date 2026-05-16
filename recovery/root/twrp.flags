@@ -32,4 +32,4 @@
 /persistent  backup=0;flash=0;wipe=0;mount=0;
 
 # Super partition — OCULTA para evitar soft brick
-/super       backup=0;flash=0;wipe=0;mount=0;display=Super;
+/super       backup=0;flash=0;wipe=0;mount=0;

@@ -162,7 +162,7 @@ TW_INCLUDE_7ZA := true
 TW_INCLUDE_REPACKTOOLS := true
 TW_INCLUDE_RESETPROP := true
 TW_INCLUDE_LIBRESETPROP := true
-# TW_ENABLE_ALL_PARTITION_TOOLS := true  # NO activar: muestra super y rompe el instalador
+TW_ENABLE_ALL_PARTITION_TOOLS := true
 
 # F2FS
 TW_ENABLE_FS_COMPRESSION := false

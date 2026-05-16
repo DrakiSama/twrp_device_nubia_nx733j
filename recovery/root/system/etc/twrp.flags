@@ -1,7 +1,35 @@
-# Android fstab file.
-# The filesystem that contains the filesystem checker binary (typically /system) cannot
-# specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK
+# TWRP Partition Flags - Nubia Z70 Ultra (NX733J)
+# Controla qué particiones se muestran en Install/Wipe/Backup
+# NO agregar /super — flashearla destruye TODAS las particiones lógicas
 
-# mount point          fstype  device                                     device2                 flags
+# Particiones lógicas (dentro de super) — visibles para instalar ROMs
+/system      backup=1;flash=1;wipe=0;mount=1;
+/system_ext  backup=1;flash=1;wipe=0;mount=1;
+/product     backup=1;flash=1;wipe=0;mount=1;
+/vendor      backup=1;flash=1;wipe=0;mount=1;
+/odm         backup=0;flash=1;wipe=0;mount=1;
+/vendor_dlkm backup=0;flash=1;wipe=0;mount=1;
+/odm_dlkm    backup=0;flash=1;wipe=0;mount=1;
+/system_dlkm backup=0;flash=1;wipe=0;mount=1;
 
-# Logical partitions
+# Boot partitions
+/boot        backup=1;flash=1;wipe=0;mount=0;
+/vendor_boot backup=1;flash=1;wipe=0;mount=0;
+/init_boot   backup=1;flash=1;wipe=0;mount=0;
+/dtbo        backup=1;flash=1;wipe=0;mount=0;
+/recovery    backup=1;flash=0;wipe=0;mount=0;
+/vbmeta      backup=1;flash=1;wipe=0;mount=0;
+/vbmeta_system backup=1;flash=1;wipe=0;mount=0;
+
+# Data
+/data        backup=1;flash=0;wipe=1;mount=1;storage=1;
+/metadata    backup=0;flash=0;wipe=1;mount=1;
+
+# Firmware (no tocar)
+/persist     backup=1;flash=0;wipe=0;mount=1;
+/firmware    backup=0;flash=0;wipe=0;mount=0;
+/misc        backup=0;flash=0;wipe=0;mount=0;
+/persistent  backup=0;flash=0;wipe=0;mount=0;
+
+# Super partition — OCULTA para evitar soft brick
+/super       backup=0;flash=0;wipe=0;mount=0;

@@ -59,9 +59,10 @@ on property:twrp.modules.loaded=true
     # Load ADSP firmware for PMIC
     wait /sys/kernel/boot_adsp/ssr
     write /sys/kernel/boot_adsp/ssr 1
-    wait /sys/class/power_supply/battery
+    # Esperar battery sysfs con timeout de 5s — si no aparece, igual seguir
     start vendor.health-default
     start vendor.charger
+    wait /sys/class/power_supply/battery 5
     # vendor debe quedar montado para los servicios HAL (health, boot, etc.)
     # si se necesita modificar vendor, twrp lo remonta RW
     # umount /vendor

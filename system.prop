@@ -33,8 +33,6 @@ ro.product.name=PQ84A01-UN
 
 # Build fingerprint
 ro.build.fingerprint=nubia/PQ84A01-UN/PQ84A01:16/BQ2A.250705.001-BP2A.250605.031.A3/20260210.135030:user/release-keys
-ro.build.version.security_patch=2026-02-01
-
 # Vendor security patch (vendor está en Android 15)
 ro.vendor.build.security_patch=2025-12-01
 

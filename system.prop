@@ -45,6 +45,9 @@ ro.boot.boot_devices=soc/1d84000.ufshc
 # Display
 ro.sf.lcd_density=520
 
+# TWRP
+ro.twrp.device.version=by Draki
+
 # Crypto / FBE
 ro.crypto.state=encrypted
 ro.crypto.type=file

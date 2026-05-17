@@ -49,7 +49,6 @@ on fs
 on boot
     setprop sys.usb.config adb
     setprop twrp.mtp 1
-    exec u:r:recovery:s0 -- /system/bin/setenforce 0
 
 # vendor_dlkm mount + módulos + servicios
 on property:twrp.modules.loaded=true

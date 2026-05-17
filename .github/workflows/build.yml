@@ -86,12 +86,12 @@ jobs:
 
     - name: Setup zram
       run: |
-        sudo apt update -y
-        sudo apt install -y zram-tools
-        sudo sed -i 's/^#PERCENT=50/PERCENT=90/' /etc/default/zramswap
-        sudo sed -i 's/^#PRIORITY=100/PRIORITY=1000/' /etc/default/zramswap
-        sudo systemctl restart zramswap
-        zramctl
+        sudo modprobe zram
+        echo 90G | sudo tee /sys/block/zram0/disksize
+        sudo mkswap /dev/zram0
+        sudo swapon /dev/zram0 -p 1000
+        swapon --show
+        free -h
         df -h
 
     - name: Setup environment

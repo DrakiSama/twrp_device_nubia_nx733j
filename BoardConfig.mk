@@ -200,7 +200,7 @@ TW_USE_SERIALNO_PROPERTY_FOR_DEVICE_ID := true
 TW_SCREEN_BLANK_ON_BOOT := true
 # Módulos de vendor requeridos para display, touch y battery (Nubia/ZTE sun platform)
 # Verificados contra kernel source NX733J V(15) y vendor_boot stock
-TW_LOAD_VENDOR_MODULES := "msm.ko drm_display_helper.ko panel_event_notifier.ko dispcc-sun.ko gpucc-sun.ko zte_tpd.ko aw9620x.ko"
+TW_LOAD_VENDOR_MODULES := "msm.ko drm_display_helper.ko panel_event_notifier.ko dispcc-sun.ko gpucc-sun.ko zte_tpd.ko aw9620x.ko qti_battery_charger.ko zte_power_supply.ko bcl_pmic5.ko bcl_soc.ko"
 TW_LOAD_VENDOR_MODULES_EXCLUDE_GKI := true
 TW_LOAD_PREBUILT_MODULES_AT_FIRST := true
 TW_CUSTOM_CPU_TEMP_PATH := "/sys/class/thermal/thermal_zone1/temp"

@@ -47,9 +47,7 @@ on fs
     mount none /tmp/persist /mnt/vendor/persist bind rec
 
 on boot
-    # ADB + root temprano
     setprop sys.usb.config adb
-    setprop service.adb.root 1
 
 # vendor_dlkm mount + módulos + servicios
 on property:twrp.modules.loaded=true

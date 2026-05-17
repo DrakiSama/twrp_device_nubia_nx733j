@@ -87,8 +87,7 @@ jobs:
     - name: Setup zram
       run: |
         sudo apt update -y
-        sudo apt install -y linux-modules-extra-$(uname -r) zram-tools
-        sudo modprobe zram
+        sudo apt install -y zram-tools
         sudo sed -i 's/^#PERCENT=50/PERCENT=90/' /etc/default/zramswap
         sudo sed -i 's/^#PRIORITY=100/PRIORITY=1000/' /etc/default/zramswap
         sudo systemctl restart zramswap
@@ -109,7 +108,6 @@ jobs:
         TIP_PID=$!
         repo sync -c --no-tags --optimized-fetch --prune
         kill $TIP_PID 2>/dev/null || true
-        # Libera espacio eliminando .repo (~8 GB)
         rm -rf .repo
         df -h
 

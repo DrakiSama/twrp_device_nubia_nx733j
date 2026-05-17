@@ -56,13 +56,6 @@ on property:twrp.modules.loaded=true
     # Firmware modem
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
-    # ADSP firmware para PMIC (timeout 3s — puede no existir en recovery)
-    wait /sys/kernel/boot_adsp/ssr 3
-    write /sys/kernel/boot_adsp/ssr 1
-    # Battery HAL services
-    start vendor.health-default
-    start vendor.charger
-    # Firmware symlink
     symlink /firmware /vendor/firmware_mnt
 
 on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=true
@@ -78,6 +71,4 @@ on property:servicemanager.ready=true
 # vendor.qti.vibrator deshabilitado — TW_NO_HAPTICS := true, causa touch lag severo
 
 on post-fs
-    write /sys/kernel/fan/fan_enable 1
-    write /sys/kernel/fan/fan_speed_level 1
-    write /sys/class/leds/aw22xxx_led/trigger battery-charging-or-full
+    # nop

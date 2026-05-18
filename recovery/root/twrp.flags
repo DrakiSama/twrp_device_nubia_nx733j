@@ -3,43 +3,43 @@
 # NO agregar /super — flashearla destruye TODAS las particiones lógicas
 
 # Particiones lógicas (dentro de super) — visibles para instalar ROMs
-/system      backup=1;flash=1;wipe=0;mount=1;
-/system_ext  backup=1;flash=1;wipe=0;mount=1;
-/product     backup=1;flash=1;wipe=0;mount=1;
-/vendor      backup=1;flash=1;wipe=0;mount=1;
-/odm         backup=0;flash=1;wipe=0;mount=1;
-/vendor_dlkm backup=0;flash=0;wipe=0;mount=1;
-/odm_dlkm    backup=0;flash=0;wipe=0;mount=1;
-/system_dlkm backup=0;flash=0;wipe=0;mount=1;
+/system      ext4      backup=1;flash=1;wipe=0;mount=1;
+/system_ext  ext4      backup=1;flash=1;wipe=0;mount=1;
+/product     ext4      backup=1;flash=1;wipe=0;mount=1;
+/vendor      ext4      backup=1;flash=1;wipe=0;mount=1;
+/odm         ext4      backup=0;flash=1;wipe=0;mount=1;
+/vendor_dlkm ext4      backup=0;flash=0;wipe=0;mount=1;
+/odm_dlkm    ext4      backup=0;flash=0;wipe=0;mount=1;
+/system_dlkm ext4      backup=0;flash=0;wipe=0;mount=1;
 
 # Boot partitions (per-slot + slotselect)
-/boot_a      backup=0;flash=1;wipe=0;mount=0;
-/boot_b      backup=0;flash=1;wipe=0;mount=0;
-/boot        backup=1;flash=1;wipe=0;mount=0;
-/vendor_boot_a backup=0;flash=1;wipe=0;mount=0;
-/vendor_boot_b backup=0;flash=1;wipe=0;mount=0;
-/vendor_boot backup=1;flash=1;wipe=0;mount=0;
-/init_boot_a backup=0;flash=1;wipe=0;mount=0;
-/init_boot_b backup=0;flash=1;wipe=0;mount=0;
-/init_boot   backup=1;flash=1;wipe=0;mount=0;
-/recovery_a  backup=0;flash=1;wipe=0;mount=0;
-/recovery_b  backup=0;flash=1;wipe=0;mount=0;
-/recovery    backup=1;flash=0;wipe=0;mount=0;
-/dtbo_a      backup=0;flash=1;wipe=0;mount=0;
-/dtbo_b      backup=0;flash=1;wipe=0;mount=0;
-/dtbo        backup=1;flash=1;wipe=0;mount=0;
-/vbmeta      backup=1;flash=1;wipe=0;mount=0;
-/vbmeta_system backup=1;flash=1;wipe=0;mount=0;
+/boot_a      emmc      backup=0;flash=1;wipe=0;mount=0;
+/boot_b      emmc      backup=0;flash=1;wipe=0;mount=0;
+/boot        emmc      backup=1;flash=1;wipe=0;mount=0;
+/vendor_boot_a emmc    backup=0;flash=1;wipe=0;mount=0;
+/vendor_boot_b emmc    backup=0;flash=1;wipe=0;mount=0;
+/vendor_boot emmc      backup=1;flash=1;wipe=0;mount=0;
+/init_boot_a emmc      backup=0;flash=1;wipe=0;mount=0;
+/init_boot_b emmc      backup=0;flash=1;wipe=0;mount=0;
+/init_boot   emmc      backup=1;flash=1;wipe=0;mount=0;
+/recovery_a  emmc      backup=0;flash=1;wipe=0;mount=0;
+/recovery_b  emmc      backup=0;flash=1;wipe=0;mount=0;
+/recovery    emmc      backup=1;flash=0;wipe=0;mount=0;
+/dtbo_a      emmc      backup=0;flash=1;wipe=0;mount=0;
+/dtbo_b      emmc      backup=0;flash=1;wipe=0;mount=0;
+/dtbo        emmc      backup=1;flash=1;wipe=0;mount=0;
+/vbmeta      emmc      backup=1;flash=1;wipe=0;mount=0;
+/vbmeta_system emmc    backup=1;flash=1;wipe=0;mount=0;
 
 # Data
-/data        backup=1;flash=0;wipe=1;mount=1;storage=1;
-/metadata    backup=0;flash=0;wipe=1;mount=1;
+/data        f2fs      backup=1;flash=0;wipe=1;mount=1;storage=1;
+/metadata    f2fs      backup=0;flash=0;wipe=1;mount=1;
 
 # Firmware (no tocar)
-/persist     backup=1;flash=0;wipe=0;mount=1;
-/firmware    backup=0;flash=0;wipe=0;mount=0;
-/misc        backup=0;flash=0;wipe=0;mount=0;
-/persistent  backup=0;flash=0;wipe=0;mount=0;
+/persist     ext4      backup=1;flash=0;wipe=0;mount=1;
+/firmware    vfat      backup=0;flash=0;wipe=0;mount=0;
+/misc        emmc      backup=0;flash=0;wipe=0;mount=0;
+/persistent  emmc      backup=0;flash=0;wipe=0;mount=0;
 
 # Super partition — OCULTA para evitar soft brick
-/super       backup=0;flash=0;wipe=0;mount=0;
+/super       raw       backup=0;flash=0;wipe=0;mount=0;

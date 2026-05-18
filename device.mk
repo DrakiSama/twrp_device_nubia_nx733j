@@ -33,6 +33,10 @@ PRODUCT_APEX_SYSTEM_SERVER_JARS += com.android.crashrecovery:service-crashrecove
 # Enable Fuse Passthrough
 PRODUCT_PROPERTY_OVERRIDES += persist.sys.fuse.passthrough.enable=true
 
+# Required libraries
+PRODUCT_PACKAGES += \
+    libsysutils
+
 # Otacert
 PRODUCT_EXTRA_RECOVERY_KEYS += \
     $(DEVICE_PATH)/security/releasekey

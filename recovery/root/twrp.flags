@@ -12,12 +12,22 @@
 /odm_dlkm    backup=0;flash=0;wipe=0;mount=1;
 /system_dlkm backup=0;flash=0;wipe=0;mount=1;
 
-# Boot partitions
+# Boot partitions (per-slot + slotselect)
+/boot_a      backup=0;flash=1;wipe=0;mount=0;
+/boot_b      backup=0;flash=1;wipe=0;mount=0;
 /boot        backup=1;flash=1;wipe=0;mount=0;
+/vendor_boot_a backup=0;flash=1;wipe=0;mount=0;
+/vendor_boot_b backup=0;flash=1;wipe=0;mount=0;
 /vendor_boot backup=1;flash=1;wipe=0;mount=0;
+/init_boot_a backup=0;flash=1;wipe=0;mount=0;
+/init_boot_b backup=0;flash=1;wipe=0;mount=0;
 /init_boot   backup=1;flash=1;wipe=0;mount=0;
-/dtbo        backup=1;flash=1;wipe=0;mount=0;
+/recovery_a  backup=0;flash=1;wipe=0;mount=0;
+/recovery_b  backup=0;flash=1;wipe=0;mount=0;
 /recovery    backup=1;flash=0;wipe=0;mount=0;
+/dtbo_a      backup=0;flash=1;wipe=0;mount=0;
+/dtbo_b      backup=0;flash=1;wipe=0;mount=0;
+/dtbo        backup=1;flash=1;wipe=0;mount=0;
 /vbmeta      backup=1;flash=1;wipe=0;mount=0;
 /vbmeta_system backup=1;flash=1;wipe=0;mount=0;
 

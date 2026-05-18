@@ -84,12 +84,12 @@ jobs:
         create-symlink: true
         max-size: 2G
 
-    - name: Setup zram
+    - name: Setup swap file
       run: |
-        sudo modprobe zram
-        echo 90G | sudo tee /sys/block/zram0/disksize
-        sudo mkswap /dev/zram0
-        sudo swapon /dev/zram0 -p 1000
+        sudo fallocate -l 8G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile -p 1000
         swapon --show
         free -h
         df -h

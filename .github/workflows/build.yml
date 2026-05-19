@@ -118,6 +118,11 @@ jobs:
           echo "Source already synced, skipping..."
         fi
 
+    - name: Clean stale artifacts
+      run: |
+        rm -rf ~/twrp/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/etc
+        echo "Cleaned stale recovery/root/etc"
+
     - name: Setup device
       run: |
         rm -rf ~/twrp/device/${{ github.event.inputs.DEVICE_PATH }}

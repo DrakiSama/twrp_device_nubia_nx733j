@@ -123,6 +123,13 @@ jobs:
         rm -rf ~/twrp/device/${{ github.event.inputs.DEVICE_PATH }}
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ~/twrp/device/${{ github.event.inputs.DEVICE_PATH }}
 
+    - name: Inject commit hash into branding
+      run: |
+        cd ~/twrp/device/${{ github.event.inputs.DEVICE_PATH }}
+        HASH=$(git rev-parse --short HEAD)
+        sed -i "s/TW_DEVICE_VERSION := by Draki/TW_DEVICE_VERSION := by Draki ($HASH)/" BoardConfig.mk
+        echo "TW_DEVICE_VERSION=$(grep 'TW_DEVICE_VERSION' BoardConfig.mk)"
+
     - name: Generate build info
       run: |
         echo -e "$BUILD_INFO" >> INFO.txt

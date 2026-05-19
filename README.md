@@ -1,5 +1,7 @@
 # TWRP para Nubia Z70 Ultra (NX733J / PQ84A01)
 
+**Release estable:** `da439bd` — Sin errores, todas las funciones operativas.
+
 ---
 
 ## 🇪🇸 Español
@@ -13,7 +15,8 @@
 | Display | ✅ 1260×2800 |
 | Touch | ✅ Goodix GT9916 |
 | Fastbootd | ✅ |
-| Flasheo particiones | ✅ boot_a/b, vendor_boot_a/b, init_boot_a/b, dtbo_a/b, recovery_a/b |
+| Flasheo particiones | ✅ boot, init_boot, recovery, dtbo + _a/_b por slot |
+| Errores en pantalla | ❌ Ninguno |
 | Backup/Restore | ✅ Compresión habilitada |
 | USB-OTG | ✅ |
 | EDL Mode | ✅ Reinicio a EDL |
@@ -24,6 +27,7 @@
 ### Características
 
 - **Splash personalizado**: "TWRP by Draki"
+- **Commit hash en branding**: Se inyecta automático en CI (About: "by Draki (xxxxxxx)")
 - **Idioma por defecto**: Español (es_ES)
 - **Tamaño de fuente**: 20
 - **Timeout de pantalla**: 120 segundos
@@ -73,7 +77,8 @@ m recoveryimage -j$(nproc)
 | Display | ✅ 1260×2800 |
 | Touch | ✅ Goodix GT9916 |
 | Fastbootd | ✅ |
-| Partition flashing | ✅ boot_a/b, vendor_boot_a/b, init_boot_a/b, dtbo_a/b, recovery_a/b |
+| Partition flashing | ✅ boot, init_boot, recovery, dtbo + _a/_b per slot |
+| On-screen errors | ❌ None |
 | Backup/Restore | ✅ Compression enabled |
 | USB-OTG | ✅ |
 | EDL Mode | ✅ Reboot to EDL |
@@ -84,6 +89,7 @@ m recoveryimage -j$(nproc)
 ### Features
 
 - **Custom splash**: "TWRP by Draki"
+- **Commit hash in branding**: Auto-injected during CI (About: "by Draki (xxxxxxx)")
 - **Default locale**: Spanish (es_ES)
 - **Font size**: 20
 - **Screen timeout**: 120 seconds

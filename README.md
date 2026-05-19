@@ -17,7 +17,7 @@
 | Backup/Restore | ✅ Compresión habilitada |
 | USB-OTG | ✅ |
 | EDL Mode | ✅ Reinicio a EDL |
-| Crypto / Decrypt | ❌ Reinicia al intentar desencriptar |
+| Crypto / Decrypt | ✅ Funcional |
 | Batería | ❌ No disponible en recovery (kernel limitation) |
 | Vibrator | ❌ Causa lag táctil severo, deshabilitado |
 
@@ -57,7 +57,6 @@ m recoveryimage -j$(nproc)
 
 ### Issues conocidos
 
-- **Decrypt**: El dispositivo se reinicia al desencriptar /data. Probablemente relacionado con crypto kernel o f2fs.
 - **Batería**: El kernel no expone `/sys/class/power_supply/battery` en recovery.
 - **WiFi**: No incluido en recovery (no necesario).
 
@@ -78,7 +77,7 @@ m recoveryimage -j$(nproc)
 | Backup/Restore | ✅ Compression enabled |
 | USB-OTG | ✅ |
 | EDL Mode | ✅ Reboot to EDL |
-| Crypto / Decrypt | ❌ Reboots when attempting decrypt |
+| Crypto / Decrypt | ✅ Working |
 | Battery | ❌ Unavailable in recovery (kernel limitation) |
 | Vibrator | ❌ Causes severe touch lag, disabled |
 
@@ -118,7 +117,6 @@ m recoveryimage -j$(nproc)
 
 ### Known issues
 
-- **Decrypt**: Device reboots when decrypting /data. Likely crypto kernel or f2fs related.
 - **Battery**: Kernel does not expose `/sys/class/power_supply/battery` in recovery.
 - **WiFi**: Not included in recovery (not needed).
 

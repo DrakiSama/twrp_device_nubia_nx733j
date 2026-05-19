@@ -10,7 +10,6 @@
 /vendor      backup=1;flash=1;wipe=0;mount=1;
 /odm         backup=0;flash=1;wipe=0;mount=1;
 /vendor_dlkm backup=0;flash=0;wipe=0;mount=1;
-/odm_dlkm    backup=0;flash=0;wipe=0;mount=1;
 /system_dlkm backup=0;flash=0;wipe=0;mount=1;
 
 # Boot partitions (per-slot + slotselect)
@@ -29,8 +28,6 @@
 /dtbo_a      backup=0;flash=1;wipe=0;mount=0;
 /dtbo_b      backup=0;flash=1;wipe=0;mount=0;
 /dtbo        backup=1;flash=1;wipe=0;mount=0;
-/vbmeta      backup=1;flash=1;wipe=0;mount=0;
-/vbmeta_system backup=1;flash=1;wipe=0;mount=0;
 
 # Data
 /data        backup=1;flash=0;wipe=1;mount=1;storage=1;

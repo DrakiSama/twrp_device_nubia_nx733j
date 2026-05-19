@@ -33,6 +33,9 @@ system_dlkm                                              /system_dlkm    ext4   
 /dev/block/bootdevice/by-name/dtbo                       /dtbo           emmc     defaults                                                                       defaults,slotselect
 /dev/block/bootdevice/by-name/misc                       /misc           emmc     defaults                                                                       defaults
 /dev/block/bootdevice/by-name/frp                        /persistent     emmc     defaults                                                                       defaults
+/dev/block/bootdevice/by-name/vbmeta                     /vbmeta         emmc     defaults                                                                       defaults
+/dev/block/bootdevice/by-name/vbmeta_system              /vbmeta_system  emmc     defaults                                                                       defaults
+/dev/block/by-name/super                                 /super          emmc     defaults                                                                       defaults
 
 # Metadata (must mount before /data for wrappedkey derivation)
 /dev/block/bootdevice/by-name/metadata                   /metadata       f2fs     noatime,nosuid,nodev,discard                                                                                                               wait,check,formattable,wrappedkey,first_stage_mount

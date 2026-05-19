@@ -137,6 +137,11 @@ jobs:
         cat INFO.txt
       working-directory: /home/draki/twrp/device/${{ github.event.inputs.DEVICE_PATH }}
 
+    - name: Clean cached twrp.flags
+      run: |
+        rm -f ~/twrp/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/system/etc/twrp.flags
+        rm -f ~/twrp/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/recovery/root/twrp.flags
+
     - name: Build TWRP
       run: |
         cd ~/twrp

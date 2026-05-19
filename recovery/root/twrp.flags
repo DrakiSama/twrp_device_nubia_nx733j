@@ -42,4 +42,4 @@
 /persistent  emmc      backup=0;flash=0;wipe=0;mount=0;
 
 # Super partition — OCULTA para evitar soft brick
-/super       raw       backup=0;flash=0;wipe=0;mount=0;
+/super       emmc      backup=0;flash=0;wipe=0;mount=0;

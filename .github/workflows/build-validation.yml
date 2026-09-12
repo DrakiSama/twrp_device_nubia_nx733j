@@ -1,0 +1,98 @@
+name: TWRP NX733J - GitHub hosted
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: twrp-nx733j-hosted
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    env:
+      TWRP_ROOT: /home/runner/twrp
+      ALLOW_MISSING_DEPENDENCIES: 'true'
+      GOMEMLIMIT: 10GiB
+      GOGC: '50'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare disposable GitHub runner
+        run: |
+          set -Eeuo pipefail
+          [[ "$RUNNER_ENVIRONMENT" == github-hosted ]] || exit 1
+          # These SDKs are removed only from GitHub's disposable VM.
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache /usr/local/lib/powershell \
+            /usr/share/swift /usr/local/share/boost
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends git-core gnupg flex bison \
+            build-essential zip curl zlib1g-dev libc6-dev-i386 lib32ncurses5-dev \
+            x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils \
+            xsltproc unzip fontconfig python3 python-is-python3 libssl-dev \
+            liblz4-tool lzop bc rsync openjdk-17-jdk-headless
+          sudo apt-get clean
+          sudo fallocate -l 8G /mnt/twrp.swap
+          sudo chmod 600 /mnt/twrp.swap
+          sudo mkswap /mnt/twrp.swap
+          sudo swapon /mnt/twrp.swap
+          mkdir -p "$HOME/bin" "$TWRP_ROOT" "$GITHUB_WORKSPACE/build-artifacts"
+          curl --fail --location --retry 3 https://storage.googleapis.com/git-repo-downloads/repo -o "$HOME/bin/repo"
+          chmod +x "$HOME/bin/repo"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+          git config --global user.name 'TWRP Builder'
+          git config --global user.email 'twrp-builder@users.noreply.github.com'
+          df -h
+          free -h
+      - name: Sync TWRP 16 sources
+        run: |
+          set -Eeuo pipefail
+          exec > >(tee "$GITHUB_WORKSPACE/build-artifacts/sync.log") 2>&1
+          cd "$TWRP_ROOT"
+          repo init -u https://github.com/TWRP-Test/platform_manifest_twrp_aosp \
+            -b twrp-16.0 --depth=1
+          synced=false
+          for attempt in 1 2 3; do
+            if repo sync -c --no-tags --no-clone-bundle --optimized-fetch --fail-fast -j4; then
+              synced=true
+              break
+            fi
+            sleep 10
+          done
+          "$synced"
+          repo manifest -r > "$GITHUB_WORKSPACE/build-artifacts/manifest-pinned.xml"
+          df -h "$TWRP_ROOT"
+      - name: Build recovery from this exact commit
+        run: |
+          set -Ee -o pipefail
+          artifacts="$GITHUB_WORKSPACE/build-artifacts"
+          exec > >(tee "$artifacts/build.log") 2>&1
+          cd "$TWRP_ROOT"
+          mkdir -p device/nubia/NX733J
+          git -C "$GITHUB_WORKSPACE" archive HEAD | tar -x -C device/nubia/NX733J
+          printf 'Device tree: %s\nRun: %s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > "$artifacts/BUILD_INFO.txt"
+          source build/envsetup.sh
+          lunch twrp_NX733J
+          m recoveryimage -j4
+          img=out/target/product/NX733J/recovery.img
+          [[ -s "$img" ]] && (( $(stat -c %s "$img") <= 104857600 ))
+          cp "$img" "$artifacts/recovery-NX733J-${GITHUB_SHA:0:7}.img"
+          cd "$artifacts"
+          sha256sum ./*.img > SHA256SUMS
+      - name: Upload validation image and build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NX733J-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-artifacts/
+          if-no-files-found: warn
+          retention-days: 14

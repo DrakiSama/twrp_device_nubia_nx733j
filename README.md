@@ -1,140 +1,49 @@
 # TWRP para Nubia Z70 Ultra (NX733J / PQ84A01)
 
-**Release estable:** `da439bd` — Sin errores, todas las funciones operativas.
+Árbol en depuración. Los cambios de fstab y flags se validaron en RAM sobre
+TWRP `3.7.1_16-by Draki (da439bd)` el 2026-09-12; falta compilar y probar un arranque
+nuevo. No se ha validado todavía el flasheo completo de una IMG, ZIP u OTA.
 
----
+## Estado comprobado
 
-## 🇪🇸 Español
+- ADB y descifrado de userdata operativos en el recovery instalado.
+- Siete particiones lógicas EROFS montadas en solo lectura con la configuración corregida.
+- Flags de flasheo reconocidas para lógicas y particiones físicas por slot.
+- Grupo real: `qti_dynamic_partitions`; super: 17179869184 bytes.
+- USB OTG temporalmente retirado del fstab: la detección actual confunde UFS interno con USB.
+- Fastbootd, backup/restore y arranque del build nuevo pendientes de prueba.
 
-### Estado
+## Particiones
 
-| Funcionalidad | Estado |
-|--------------|--------|
-| ADB | ✅ Funcional |
-| MTP | ✅ Por defecto |
-| Display | ✅ 1260×2800 |
-| Touch | ✅ Goodix GT9916 |
-| Fastbootd | ✅ |
-| Flasheo particiones | ✅ boot, init_boot, recovery, dtbo + _a/_b por slot |
-| Errores en pantalla | ❌ Ninguno |
-| Backup/Restore | ✅ Compresión habilitada |
-| USB-OTG | ✅ |
-| EDL Mode | ✅ Reinicio a EDL |
-| Crypto / Decrypt | ✅ Funcional |
-| Batería | ❌ No disponible en recovery (kernel limitation) |
-| Vibrator | ❌ Causa lag táctil severo, deshabilitado |
+Lógicas: system, system_ext, product, vendor, odm, vendor_dlkm y system_dlkm.
+Se resuelven mediante `logical,slotselect`, sin números dm-N ni slot fijo.
 
-### Características
+El fstab stock de Android (`fstab.qcom`) se mantiene separado del fstab de recovery.
+Las flags TWRP usan el formato completo con `flashimg`, `canbewiped` y `wipeingui`.
+Las particiones EROFS no se ofrecen como backups de archivos.
 
-- **Splash personalizado**: "TWRP by Draki"
-- **Commit hash en branding**: Se inyecta automático en CI (About: "by Draki (xxxxxxx)")
-- **Idioma por defecto**: Español (es_ES)
-- **Tamaño de fuente**: 20
-- **Timeout de pantalla**: 120 segundos
-- **Compresión de backups**: Habilitada
-- **Modo EDL**: Botón en menú Reiniciar
-- **MTP por defecto**: Al conectar USB
-- **Slot switching manual**: Particiones `_a`/`_b` visibles en Install
-- **Protección IMEI/SIM**: `modem` oculto, `persist` no flasheable
-- **Self-hosted runner**: Builds locales en ~5 min
+TWRP genera automáticamente la entrada Super: no está oculta ni bloqueada por
+eliminarla del fstab. No confundir firmware modem con las particiones de datos
+NV/modemst/fsg. No se alteraron estas particiones durante el diagnóstico.
 
-### Build local (WSL2 / Linux)
+## Compilación
+
+El workflow `.github/workflows/build-validation.yml` compila desde cero en un runner alojado por GitHub (`ubuntu-22.04`). Se ejecuta manualmente desde Actions y guarda la imagen, SHA-256, manifiesto y logs como artefactos durante 14 días. No publica una release ni flashea el dispositivo.
+
+El workflow antiguo `.github/workflows/build.yml` utiliza un runner propio y el directorio
+`/home/draki/twrp`. Clona este árbol desde GitHub, por lo que los cambios locales
+deben llegar al repositorio/rama configurados antes de usar ese workflow.
 
 ```bash
-repo init -u https://github.com/TWRP-Test/platform_manifest_twrp_aosp -b twrp-16.0 --depth=1
-repo sync -c --no-tags --optimized-fetch --prune -j$(nproc)
-git clone https://github.com/DrakiSama/twrp_device_nubia_nx733j -b twrp-16.0 device/nubia/NX733J
 source build/envsetup.sh
 export ALLOW_MISSING_DEPENDENCIES=true
 lunch twrp_NX733J
 m recoveryimage -j$(nproc)
 ```
 
-### Particiones protegidas
+Manifest empleado: https://github.com/TWRP-Test/platform_manifest_twrp_aosp,
+rama `twrp-16.0`. Device path: `device/nubia/NX733J`.
 
-| Partición | Contiene | Protegida |
-|-----------|----------|-----------|
-| `modem` | Firmware radio, IMEI | Oculta en Install |
-| `persist` | Calibraciones | Visible pero no flasheable |
-| `misc` | Bootloader | Oculta |
-| `frp` | FRP lock | Oculta |
-
-### Issues conocidos
-
-- **Batería**: El kernel no expone `/sys/class/power_supply/battery` en recovery.
-- **WiFi**: No incluido en recovery (no necesario).
-
----
-
-## 🇬🇧 English
-
-### Status
-
-| Feature | Status |
-|---------|--------|
-| ADB | ✅ Working |
-| MTP | ✅ Enabled by default |
-| Display | ✅ 1260×2800 |
-| Touch | ✅ Goodix GT9916 |
-| Fastbootd | ✅ |
-| Partition flashing | ✅ boot, init_boot, recovery, dtbo + _a/_b per slot |
-| On-screen errors | ❌ None |
-| Backup/Restore | ✅ Compression enabled |
-| USB-OTG | ✅ |
-| EDL Mode | ✅ Reboot to EDL |
-| Crypto / Decrypt | ✅ Working |
-| Battery | ❌ Unavailable in recovery (kernel limitation) |
-| Vibrator | ❌ Causes severe touch lag, disabled |
-
-### Features
-
-- **Custom splash**: "TWRP by Draki"
-- **Commit hash in branding**: Auto-injected during CI (About: "by Draki (xxxxxxx)")
-- **Default locale**: Spanish (es_ES)
-- **Font size**: 20
-- **Screen timeout**: 120 seconds
-- **Backup compression**: Enabled
-- **EDL mode**: Button in Reboot menu
-- **MTP by default**: On USB connect
-- **Manual slot switching**: `_a`/`_b` partitions visible in Install
-- **IMEI/SIM protection**: `modem` hidden, `persist` non-flashable
-- **Self-hosted runner**: Local builds in ~5 min
-
-### Build locally (WSL2 / Linux)
-
-```bash
-repo init -u https://github.com/TWRP-Test/platform_manifest_twrp_aosp -b twrp-16.0 --depth=1
-repo sync -c --no-tags --optimized-fetch --prune -j$(nproc)
-git clone https://github.com/DrakiSama/twrp_device_nubia_nx733j -b twrp-16.0 device/nubia/NX733J
-source build/envsetup.sh
-export ALLOW_MISSING_DEPENDENCIES=true
-lunch twrp_NX733J
-m recoveryimage -j$(nproc)
-```
-
-### Protected partitions
-
-| Partition | Contains | Protection |
-|-----------|----------|------------|
-| `modem` | Radio firmware, IMEI | Hidden from Install |
-| `persist` | Calibrations | Visible but non-flashable |
-| `misc` | Bootloader config | Hidden |
-| `frp` | FRP lock | Hidden |
-
-### Known issues
-
-- **Battery**: Kernel does not expose `/sys/class/power_supply/battery` in recovery.
-- **WiFi**: Not included in recovery (not needed).
-
----
-
-## 🏗️ CI / Build
-
-The repository uses GitHub Actions with a self-hosted runner for faster builds.
-
-Workflow: `.github/workflows/build.yml`
-
-## 🙏 Thanks
-
-- [YuKongA/twrp_device_xiaomi_sm8750_thales](https://github.com/YuKongA/twrp_device_xiaomi_sm8750_thales)
-- [reminon/twrp_device_nubia_nx789j](https://github.com/reminon/twrp_device_nubia_nx789j)
+Revisar el resultado del ramdisk y probar arranque, descifrado y módulos antes de
+marcar el build como estable. El informe y las evidencias locales de esta sesión
+están en `diagnostics/` junto al directorio extraído del árbol.

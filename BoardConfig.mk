@@ -83,7 +83,6 @@ AB_OTA_PARTITIONS += \
     vbmeta \
     vbmeta_system \
     odm \
-    odm_dlkm \
     product \
     system \
     system_ext \
@@ -110,24 +109,24 @@ BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
 
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_COPY_OUT_ODM := odm
-BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := erofs
 BOARD_USES_VENDOR_DLKMIMAGE := true
 TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
-BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := erofs
 
 # Dynamic Partitions — super verificado: 0x400000000 = 17179869184 bytes (16 GB)
 BOARD_SUPER_PARTITION_SIZE := 17179869184
-BOARD_SUPER_PARTITION_GROUPS := nubia_dynamic_partitions
+BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
 # Reservar ~4 MB para metadata del super
-BOARD_NUBIA_DYNAMIC_PARTITIONS_SIZE := 17175674880
-BOARD_NUBIA_DYNAMIC_PARTITIONS_PARTITION_LIST := \
+BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 17175674880
+BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := \
     system \
     system_ext \
     product \
     vendor \
     vendor_dlkm \
     odm \
-    odm_dlkm
+    system_dlkm
 
 # File systems
 TARGET_USERIMAGES_USE_EXT4 := true

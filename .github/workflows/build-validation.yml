@@ -20,8 +20,9 @@ jobs:
     env:
       TWRP_ROOT: /home/runner/twrp
       ALLOW_MISSING_DEPENDENCIES: 'true'
-      GOMEMLIMIT: 10GiB
-      GOGC: '50'
+      # soong_build runs with a restricted environment. Its launcher forwards
+      # SOONG_GOMEMLIMIT as GOMEMLIMIT; the generic variable does not reach it.
+      SOONG_GOMEMLIMIT: 10GiB
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,7 +42,7 @@ jobs:
             xsltproc unzip fontconfig python3 python-is-python3 libssl-dev \
             liblz4-tool lzop bc rsync openjdk-17-jdk-headless
           sudo apt-get clean
-          sudo fallocate -l 8G /mnt/twrp.swap
+          sudo fallocate -l 16G /mnt/twrp.swap
           sudo chmod 600 /mnt/twrp.swap
           sudo mkswap /mnt/twrp.swap
           sudo swapon /mnt/twrp.swap
@@ -76,13 +77,34 @@ jobs:
           set -Ee -o pipefail
           artifacts="$GITHUB_WORKSPACE/build-artifacts"
           exec > >(tee "$artifacts/build.log") 2>&1
+          (
+            while true; do
+              date -Is
+              free -h
+              df -h "$TWRP_ROOT"
+              ps -eo pid,comm,rss --sort=-rss | head -n 8
+              sleep 60
+            done
+          ) &
+          monitor_pid=$!
+          finish() {
+            status=$?
+            trap - EXIT
+            kill "$monitor_pid" 2>/dev/null || true
+            echo "Build step exited with status $status"
+            free -h
+            df -h "$TWRP_ROOT"
+            sudo dmesg -T | tail -n 80 || true
+            exit "$status"
+          }
+          trap finish EXIT
           cd "$TWRP_ROOT"
           mkdir -p device/nubia/NX733J
           git -C "$GITHUB_WORKSPACE" archive HEAD | tar -x -C device/nubia/NX733J
           printf 'Device tree: %s\nRun: %s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > "$artifacts/BUILD_INFO.txt"
           source build/envsetup.sh
           lunch twrp_NX733J
-          m recoveryimage -j4
+          m recoveryimage -j2
           img=out/target/product/NX733J/recovery.img
           [[ -s "$img" ]] && (( $(stat -c %s "$img") <= 104857600 ))
           cp "$img" "$artifacts/recovery-NX733J-${GITHUB_SHA:0:7}.img"

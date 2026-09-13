@@ -1,8 +1,13 @@
 # TWRP para Nubia Z70 Ultra (NX733J / PQ84A01)
 
-Árbol en depuración. Los cambios de fstab y flags se validaron en RAM sobre
-TWRP `3.7.1_16-by Draki (da439bd)` el 2026-09-12; falta compilar y probar un arranque
-nuevo. No se ha validado todavía el flasheo completo de una IMG, ZIP u OTA.
+Árbol en depuración. La imagen b0becfc compiló en GitHub y arrancó en el teléfono.
+Las pruebas del 2026-09-13 detectaron dos regresiones: los HAL de cifrado no se
+registraban en el manifiesto de recovery y el parser upstream de twrp.flags
+interpretaba mal las columnas. Ambas causas se validaron con cambios temporales
+en RAM: PIN aceptado y alias físicos del slot activo con tamaños correctos.
+Este árbol incorpora el manifiesto en system/etc/vintf y el workflow aplica el
+parche del parser. Falta validar un arranque en frío de la siguiente imagen.
+No se ha validado todavía el flasheo completo de una IMG, ZIP u OTA.
 
 ## Estado comprobado
 

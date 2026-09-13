@@ -1,0 +1,23 @@
+--- a/partitionmanager.cpp
++++ b/partitionmanager.cpp
+@@ -327,11 +327,16 @@
+                 if (i > start)
+                     tokens.push_back(line.substr(start, i - start));
+             }
++            if (tokens.empty() || tokens[0].starts_with("#"))
++                continue;
++            if (tokens.size() < 3) {
++                LOGERR("Malformed twrp.flags entry: %s\n", line.c_str());
++                continue;
++            }
+             if (!tokens.empty()) {
+-                lf.File_System = tokens[0];
+-                if (tokens.size() > 1)
+-                    lf.Primary_Block_Device = tokens[1];
+-                for (const auto &tok: tokens | std::views::drop(2)) {
++                lf.File_System = tokens[1];
++                lf.Primary_Block_Device = tokens[2];
++                for (const auto &tok: tokens | std::views::drop(3)) {
+                     if (tok[0] == '/')
+                         lf.Alternate_Block_Device = tok;
+                     else if (tok.size() > 6 && tok.starts_with("flags=")) {

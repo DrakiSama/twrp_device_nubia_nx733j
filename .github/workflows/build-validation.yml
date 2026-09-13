@@ -72,6 +72,13 @@ jobs:
           "$synced"
           repo manifest -r > "$GITHUB_WORKSPACE/build-artifacts/manifest-pinned.xml"
           df -h "$TWRP_ROOT"
+      - name: Correct upstream twrp.flags column parsing
+        run: |
+          set -Eeuo pipefail
+          cd "$TWRP_ROOT/bootable/recovery"
+          git apply --check "$GITHUB_WORKSPACE/.github/patches/twrp-flags-columns.patch"
+          git apply "$GITHUB_WORKSPACE/.github/patches/twrp-flags-columns.patch"
+          git diff > "$GITHUB_WORKSPACE/build-artifacts/recovery-source.patch"
       - name: Build recovery from this exact commit
         run: |
           set -Ee -o pipefail

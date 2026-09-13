@@ -54,3 +54,22 @@ rama `twrp-16.0`. Device path: `device/nubia/NX733J`.
 Revisar el resultado del ramdisk y probar arranque, descifrado y módulos antes de
 marcar el build como estable. El informe y las evidencias locales de esta sesión
 están en `diagnostics/` junto al directorio extraído del árbol.
+
+## Pruebas IMG y ZIP
+
+En el build 89dead7, un ZIP de diagnóstico con update-binary terminó con RC=0:
+comprobó shell root, salida a la UI, almacenamiento descifrado y lectura de las
+cinco particiones físicas del slot activo y siete lógicas. No escribió imágenes.
+Esto no valida un instalador Edify, una OTA payload.bin ni una ROM concreta.
+
+El parser de destinos A/B ya resuelve los alias activos correctamente. El método
+upstream Flash_Image todavía rechaza particiones con backup de archivos, incluidas
+las lógicas EROFS, aunque aparecen como destinos. Habilitar flashimg no implementa
+ese soporte; falta revisar Virtual A/B y el flujo de escritura antes de habilitarlo.
+
+El próximo build rechazará imágenes vacías y sparse cuyo tamaño expandido sea
+inválido o mayor que la partición. La importación y comprobación sparse se hacen
+antes de abrir el destino para escritura o ejecutar BLKDISCARD. Un error de destino
+no soportado se muestra también en pantalla. Las pruebas del método C++ real usan
+E/S simulada: nueve casos con BLKDISCARD y nueve sin él. Este cambio aún requiere
+compilarse; no se ha flasheado al teléfono ni se ha probado una escritura real.

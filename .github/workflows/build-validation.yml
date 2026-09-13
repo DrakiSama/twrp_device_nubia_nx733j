@@ -83,13 +83,17 @@ jobs:
             printf 'Manifiesto SHA-256: `%s`\n' "$(repo manifest -r | sha256sum | cut -d ' ' -f1)"
           } >> "$GITHUB_STEP_SUMMARY"
           df -h "$TWRP_ROOT"
-      - name: Correct upstream twrp.flags column parsing
+      - name: Apply recovery fixes and validate image checks
         run: |
           set -Eeuo pipefail
           cd "$TWRP_ROOT/bootable/recovery"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/twrp-flags-columns.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/twrp-flags-columns.patch"
+          git apply --check "$GITHUB_WORKSPACE/.github/patches/image-size-preflight.patch"
+          git apply "$GITHUB_WORKSPACE/.github/patches/image-size-preflight.patch"
+          python3 "$GITHUB_WORKSPACE/.github/tests/test-image-preflight.py" partition.cpp
           echo 'Parche del parser twrp.flags aplicado correctamente.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Comprobaciones de tamaño IMG y sparse verificadas antes de escribir.' >> "$GITHUB_STEP_SUMMARY"
       - name: Restore compiler cache
         id: ccache
         uses: actions/cache/restore@v5

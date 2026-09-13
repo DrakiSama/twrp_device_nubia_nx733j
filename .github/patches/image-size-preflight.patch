@@ -1,0 +1,59 @@
+--- a/partition.cpp
++++ b/partition.cpp
+@@ -3065,6 +3065,7 @@
+     LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
+ 
+     if (Backup_Method == BackupMethod::BM_FILES) {
++        gui_err("img_filesystem_unsupported=Direct IMG flashing is not supported for this filesystem partition");
+         LOGERR("Cannot flash images to file systems\n");
+         return false;
+     }
+@@ -3077,6 +3078,10 @@
+         return false;
+     }
+     unsigned long long image_size = TWFunc::Get_File_Size(full_filename);
++    if (image_size == 0) {
++        gui_err("img_empty_err=Image is empty or could not be read");
++        return false;
++    }
+     if (image_size > Size) {
+         LOGINFO("Size (%llu bytes) of image '%s' is larger than target device '%s' (%llu bytes)\n",
+                 image_size, Backup_FileName.c_str(), Actual_Block_Device.c_str(), Size);
+@@ -3114,10 +3119,6 @@
+ }
+ 
+ bool TWPartition::Flash_Sparse_Image(const std::string &Filename) {
+-#ifdef TW_ENABLE_BLKDISCARD
+-    BlkDiscard();
+-#endif
+-
+     gui_msg(Msg("flashing=Flashing {1}...")(Display_Name));
+ 
+     int in = open(Filename.c_str(), O_RDONLY);
+@@ -3130,6 +3131,16 @@
+     if (!s) {
+         close(in);
+         gui_msg(Msg(msg::kError, "sparse_import_err=Failed to import sparse image '{1}'")(Filename));
++        return false;
++    }
++
++    // Validate expanded size before opening or discarding the target partition.
++    // The sparse file on disk can be much smaller than its expanded contents.
++    int64_t expanded_size = sparse_file_len(s, false, false);
++    if (expanded_size <= 0 || static_cast<uint64_t>(expanded_size) > Size) {
++        gui_err("sparse_size_err=Expanded sparse image is invalid or larger than target partition");
++        close(in);
++        sparse_file_destroy(s);
+         return false;
+     }
+ 
+@@ -3142,6 +3153,9 @@
+         return false;
+     }
+ 
++#ifdef TW_ENABLE_BLKDISCARD
++    BlkDiscard();
++#endif
+     int ret = sparse_file_write(s, out, false, false, false);
+     close(out);
+     close(in);

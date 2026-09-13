@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Unified diffs require a space on empty context lines.
+.github/patches/*.patch text eol=lf whitespace=-blank-at-eol

@@ -91,7 +91,11 @@ jobs:
           git apply "$GITHUB_WORKSPACE/.github/patches/twrp-flags-columns.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/image-size-preflight.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/image-size-preflight.patch"
+          git apply --check "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
+          git apply "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
           python3 "$GITHUB_WORKSPACE/.github/tests/test-image-preflight.py" partition.cpp
+          python3 "$GITHUB_WORKSPACE/.github/tests/test-logical-image.py" partition.cpp
+          echo 'Soporte IMG lógico: controles de OTA, mapeo, capacidad y escritura probados con E/S simulada.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Parche del parser twrp.flags aplicado correctamente.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Comprobaciones de tamaño IMG y sparse verificadas antes de escribir.' >> "$GITHUB_STEP_SUMMARY"
       - name: Restore compiler cache

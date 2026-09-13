@@ -62,14 +62,24 @@ comprobó shell root, salida a la UI, almacenamiento descifrado y lectura de las
 cinco particiones físicas del slot activo y siete lógicas. No escribió imágenes.
 Esto no valida un instalador Edify, una OTA payload.bin ni una ROM concreta.
 
-El parser de destinos A/B ya resuelve los alias activos correctamente. El método
-upstream Flash_Image todavía rechaza particiones con backup de archivos, incluidas
-las lógicas EROFS, aunque aparecen como destinos. Habilitar flashimg no implementa
-ese soporte; falta revisar Virtual A/B y el flujo de escritura antes de habilitarlo.
+El parser de destinos A/B ya resuelve los alias activos correctamente. El próximo
+build añade una ruta dedicada para IMG raw y Android sparse en particiones lógicas,
+sin cambiar su método de respaldo por archivos. Comprueba que el destino corresponde
+al slot seleccionado y que todos los segmentos del mapa son lineales sobre super.
 
-El próximo build rechazará imágenes vacías y sparse cuyo tamaño expandido sea
-inválido o mayor que la partición. La importación y comprobación sparse se hacen
-antes de abrir el destino para escritura o ejecutar BLKDISCARD. Un error de destino
-no soportado se muestra también en pantalla. Las pruebas del método C++ real usan
-E/S simulada: nueve casos con BLKDISCARD y nueve sin él. Este cambio aún requiere
-compilarse; no se ha flasheado al teléfono ni se ha probado una escritura real.
+Requiere metadata montada, bloqueo exclusivo de /metadata/ota, estado vacío o `none`
+y directorio de snapshots vacío. Un estado desconocido, ilegible o no terminado se
+rechaza; no se cancela ni fusiona una OTA. Este control es conservador: otros formatos
+de estado también se rechazan. No se redimensionan particiones ni se modifica AVB.
+
+Antes de escribir, desmonta el destino y comprueba tipo de dispositivo, capacidad
+real y estado de solo lectura. La apertura exclusiva rechaza un dispositivo ocupado.
+Las imágenes sparse se importan y se valida su tamaño expandido; las raw también
+deben caber en la asignación actual. Esta ruta no hace BLKDISCARD ni crea/trunca
+archivos de destino, y comprueba errores de escritura y fsync.
+
+El workflow ejecuta pruebas del código C++ extraído del árbol parcheado con E/S
+simulada: controles de OTA, mapas, tamaños, errores y limpieza de recursos, además
+de las 18 pruebas del flasheo sparse físico. Falta compilar este cambio y probarlo
+con una imagen compatible. No se ha realizado ninguna escritura de imagen durante
+el diagnóstico. El ZIP de diagnóstico no demuestra que una ROM o una OTA arranque.

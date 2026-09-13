@@ -23,6 +23,13 @@ jobs:
       # soong_build runs with a restricted environment. Its launcher forwards
       # SOONG_GOMEMLIMIT as GOMEMLIMIT; the generic variable does not reach it.
       SOONG_GOMEMLIMIT: 10GiB
+      USE_CCACHE: '1'
+      CCACHE_EXEC: /usr/bin/ccache
+      # Must stay under out/: Android's build sandbox makes other paths read-only.
+      CCACHE_DIR: /home/runner/twrp/out/ccache
+      CCACHE_TEMPDIR: /home/runner/twrp/out/ccache/tmp
+      CCACHE_BASEDIR: /home/runner/twrp
+      CCACHE_COMPILERCHECK: content
     steps:
       - uses: actions/checkout@v4
         with:
@@ -40,7 +47,7 @@ jobs:
             build-essential zip curl zlib1g-dev libc6-dev-i386 lib32ncurses5-dev \
             x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils \
             xsltproc unzip fontconfig python3 python-is-python3 libssl-dev \
-            liblz4-tool lzop bc rsync openjdk-17-jdk-headless
+            liblz4-tool lzop bc rsync ccache openjdk-17-jdk-headless
           sudo apt-get clean
           sudo fallocate -l 16G /mnt/twrp.swap
           sudo chmod 600 /mnt/twrp.swap
@@ -57,7 +64,6 @@ jobs:
       - name: Sync TWRP 16 sources
         run: |
           set -Eeuo pipefail
-          exec > >(tee "$GITHUB_WORKSPACE/build-artifacts/sync.log") 2>&1
           cd "$TWRP_ROOT"
           repo init -u https://github.com/TWRP-Test/platform_manifest_twrp_aosp \
             -b twrp-16.0 --depth=1
@@ -70,7 +76,12 @@ jobs:
             sleep 10
           done
           "$synced"
-          repo manifest -r > "$GITHUB_WORKSPACE/build-artifacts/manifest-pinned.xml"
+          {
+            echo '### Fuentes'
+            printf 'Device tree: `%s`\n\n' "$GITHUB_SHA"
+            printf 'TWRP: `%s`\n\n' "$(git -C bootable/recovery rev-parse HEAD)"
+            printf 'Manifiesto SHA-256: `%s`\n' "$(repo manifest -r | sha256sum | cut -d ' ' -f1)"
+          } >> "$GITHUB_STEP_SUMMARY"
           df -h "$TWRP_ROOT"
       - name: Correct upstream twrp.flags column parsing
         run: |
@@ -78,50 +89,72 @@ jobs:
           cd "$TWRP_ROOT/bootable/recovery"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/twrp-flags-columns.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/twrp-flags-columns.patch"
-          git diff > "$GITHUB_WORKSPACE/build-artifacts/recovery-source.patch"
+          echo 'Parche del parser twrp.flags aplicado correctamente.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Restore compiler cache
+        id: ccache
+        uses: actions/cache/restore@v5
+        continue-on-error: true
+        with:
+          path: /home/runner/twrp/out/ccache
+          key: twrp-ccache-v1-ubuntu22-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            twrp-ccache-v1-ubuntu22-${{ github.sha }}-
+            twrp-ccache-v1-ubuntu22-
       - name: Build recovery from this exact commit
+        id: build
         run: |
           set -Ee -o pipefail
           artifacts="$GITHUB_WORKSPACE/build-artifacts"
-          exec > >(tee "$artifacts/build.log") 2>&1
-          (
-            while true; do
-              date -Is
-              free -h
-              df -h "$TWRP_ROOT"
-              ps -eo pid,comm,rss --sort=-rss | head -n 8
-              sleep 60
-            done
-          ) &
-          monitor_pid=$!
+          mkdir -p "$CCACHE_TEMPDIR"
+          ccache -M 5G
+          ccache -o compression=true
+          ccache -z
+          build_started=$SECONDS
           finish() {
             status=$?
             trap - EXIT
-            kill "$monitor_pid" 2>/dev/null || true
-            echo "Build step exited with status $status"
-            free -h
-            df -h "$TWRP_ROOT"
-            sudo dmesg -T | tail -n 80 || true
+            {
+              echo '### Compilación'
+              printf 'Duración: %s minutos. Código de salida: %s.\n\n' "$(( (SECONDS - build_started) / 60 ))" "$status"
+              echo '```text'
+              ccache -s
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            if (( status != 0 )); then
+              free -h
+              df -h "$TWRP_ROOT"
+              sudo dmesg -T | tail -n 80 || true
+            fi
             exit "$status"
           }
           trap finish EXIT
           cd "$TWRP_ROOT"
           mkdir -p device/nubia/NX733J
           git -C "$GITHUB_WORKSPACE" archive HEAD | tar -x -C device/nubia/NX733J
-          printf 'Device tree: %s\nRun: %s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > "$artifacts/BUILD_INFO.txt"
           source build/envsetup.sh
           lunch twrp_NX733J
-          m recoveryimage -j2
+          # Use all four hosted-runner CPUs; keep the working Soong memory limit.
+          m recoveryimage -j4
           img=out/target/product/NX733J/recovery.img
           [[ -s "$img" ]] && (( $(stat -c %s "$img") <= 104857600 ))
           cp "$img" "$artifacts/recovery-NX733J-${GITHUB_SHA:0:7}.img"
-          cd "$artifacts"
-          sha256sum ./*.img > SHA256SUMS
-      - name: Upload validation image and build logs
-        if: always()
+          {
+            echo '### Imagen'
+            printf 'Archivo: `recovery-NX733J-%s.img`\n\n' "${GITHUB_SHA:0:7}"
+            printf 'Tamaño: %s bytes\n\n' "$(stat -c %s "$img")"
+            printf 'SHA-256: `%s`\n' "$(sha256sum "$img" | cut -d ' ' -f1)"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload recovery image only
         uses: actions/upload-artifact@v4
         with:
-          name: NX733J-validation-${{ github.run_id }}-${{ github.run_attempt }}
-          path: build-artifacts/
-          if-no-files-found: warn
+          name: NX733J-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: build-artifacts/*.img
+          if-no-files-found: error
           retention-days: 14
+      - name: Save compiler cache for the next build
+        if: success()
+        uses: actions/cache/save@v5
+        continue-on-error: true
+        with:
+          path: /home/runner/twrp/out/ccache
+          key: ${{ steps.ccache.outputs.cache-primary-key }}

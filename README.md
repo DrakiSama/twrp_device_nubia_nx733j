@@ -33,7 +33,9 @@ NV/modemst/fsg. No se alteraron estas particiones durante el diagnóstico.
 
 ## Compilación
 
-El workflow `.github/workflows/build-validation.yml` compila desde cero en un runner alojado por GitHub (`ubuntu-22.04`). Se ejecuta manualmente desde Actions y guarda la imagen, SHA-256, manifiesto y logs como artefactos durante 14 días. No publica una release ni flashea el dispositivo.
+El workflow `.github/workflows/build-validation.yml` usa un runner alojado por GitHub (`ubuntu-22.04`) y cuatro trabajos de compilación, con el límite de memoria de Soong y 16 GiB de swap. Se ejecuta manualmente desde Actions y publica únicamente el `.img` como artefacto durante 14 días. SHA-256, revisiones y estadísticas quedan en el resumen de la ejecución; los logs se consultan en los pasos de Actions.
+
+Una caché de compilador comprimida de hasta 5 GB se reutiliza entre ejecuciones. La primera compilación llena la caché; las siguientes pueden reutilizar los objetos C/C++ válidos. Las fuentes todavía se sincronizan y Soong se regenera en cada VM. No se publica una release ni se flashea el dispositivo.
 
 El workflow antiguo `.github/workflows/build.yml` utiliza un runner propio y el directorio
 `/home/draki/twrp`. Clona este árbol desde GitHub, por lo que los cambios locales

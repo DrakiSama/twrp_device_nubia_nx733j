@@ -83,3 +83,20 @@ simulada: controles de OTA, mapas, tamaños, errores y limpieza de recursos, ade
 de las 18 pruebas del flasheo sparse físico. Falta compilar este cambio y probarlo
 con una imagen compatible. No se ha realizado ninguna escritura de imagen durante
 el diagnóstico. El ZIP de diagnóstico no demuestra que una ROM o una OTA arranque.
+
+## Batería y firmware de vibración
+
+Prueba en RAM del 2026-09-13: iniciar el remoteproc ADSP con el firmware del slot
+activo hizo aparecer battery/usb/wireless; battery informó 37% y Charging.
+El próximo build inicia únicamente ADSP, después de montar modem de solo lectura,
+sin reiniciar un DSP activo ni cambiar su selección de firmware. La espera es
+acotada y se ejecuta en segundo plano para no bloquear el init del recovery.
+Falta validar este orden de inicialización en un arranque limpio del nuevo build.
+
+Se incluye haptic_ram.bin extraído del vendor stock de este teléfono, SHA-256
+e446c67665c16cca99ded8d07a9cc016277a25b5cf0a7203254f8157fddc96ee.
+Al cargarlo desde el /vendor/firmware del ramdisk, ram_num pasó de 0 a 4.
+Esto valida la carga del firmware, no la vibración de la interfaz: TW_NO_HAPTICS
+permanece activado y el HAL sigue deshabilitado por el antecedente de lag táctil.
+No se añadieron módulos indiscriminadamente; los drivers correspondientes ya
+estaban cargados. No se modificaron políticas de carga ni calibraciones.

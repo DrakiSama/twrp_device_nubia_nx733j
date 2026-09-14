@@ -57,6 +57,7 @@ on property:twrp.modules.loaded=true
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
     symlink /firmware /vendor/firmware_mnt
+    exec_background u:r:recovery:s0 -- /system/bin/sh /vendor/bin/init_nx733j_hardware.sh
 
 on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=true
     start odm.prepdecrypt

@@ -60,3 +60,8 @@ PRODUCT_COPY_FILES += \
 # Recovery servicemanager reads HAL declarations from system/etc/vintf.
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/system/etc/vintf/manifest/nx733j-hals.xml:$(TARGET_COPY_OUT_RECOVERY)/root/system/etc/vintf/manifest/nx733j-hals.xml
+
+# Hardware initialization validated on NX733J in recovery RAM.
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/init_nx733j_hardware.sh:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/init_nx733j_hardware.sh \
+    $(DEVICE_PATH)/recovery/root/vendor/firmware/haptic_ram.bin:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/firmware/haptic_ram.bin

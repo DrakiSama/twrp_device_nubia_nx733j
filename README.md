@@ -100,3 +100,10 @@ Esto valida la carga del firmware, no la vibración de la interfaz: TW_NO_HAPTIC
 permanece activado y el HAL sigue deshabilitado por el antecedente de lag táctil.
 No se añadieron módulos indiscriminadamente; los drivers correspondientes ya
 estaban cargados. No se modificaron políticas de carga ni calibraciones.
+
+Validación posterior de 2686751: haptic_ram carga sus cuatro efectos tras reinicio,
+pero el exec temprano de ADSP terminó con 127. Iniciarlo desde ADB recuperó batería.
+La siguiente revisión usa un servicio oneshot con PATH y entorno del linker
+explícitos y salida a kmsg. Requiere otra validación en frío; no se considera aún
+resuelta la inicialización automática. Los logs del flasheo a recovery_b muestran
+escritura correcta a /dev/block/sde60; tras flashear ambos slots sus SHA-256 coinciden.

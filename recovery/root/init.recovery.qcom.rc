@@ -57,7 +57,7 @@ on property:twrp.modules.loaded=true
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
     symlink /firmware /vendor/firmware_mnt
-    exec_background u:r:recovery:s0 -- /system/bin/sh /vendor/bin/init_nx733j_hardware.sh
+    start vendor.recovery-hardware
 
 on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=true
     start odm.prepdecrypt
@@ -73,3 +73,17 @@ on property:servicemanager.ready=true
 
 on post-fs
     # nop
+
+# The early init environment differs from an interactive ADB shell. Explicit
+# recovery paths also keep command/linker errors visible instead of exit 127
+# from an anonymous exec with discarded stderr.
+service vendor.recovery-hardware /system/bin/sh /vendor/bin/init_nx733j_hardware.sh
+    user root
+    group root
+    disabled
+    oneshot
+    seclabel u:r:recovery:s0
+    setenv PATH /sbin:/system/bin
+    setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64/hw
+    setenv LD_CONFIG_FILE /system/etc/ld.config.txt
+    stdio_to_kmsg

@@ -51,16 +51,15 @@ on boot
 
 # vendor_dlkm mount + módulos + servicios
 on property:twrp.modules.loaded=true
-    exec u:r:recovery:s0 -- /system/bin/sh /vendor/bin/mount_vendor_dlkm.sh
-    exec u:r:recovery:s0 -- /system/bin/sh /vendor/bin/set_branding.sh
+    exec u:r:recovery:s0 -- /sbin/sh /sbin/mount_vendor_dlkm.sh
+    exec u:r:recovery:s0 -- /sbin/sh /sbin/set_branding.sh
     # Firmware modem
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
     symlink /firmware /vendor/firmware_mnt
     start vendor.recovery-hardware
 
-on property:ro.crypto.state=encrypted && property:ro.boot.dynamic_partitions=true
-    start odm.prepdecrypt
+# Decryption uses the existing KeyMint/Gatekeeper setup; no odm.prepdecrypt service exists.
 
 on property:twrp.variant.files_copied=1
     # touch daemon

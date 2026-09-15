@@ -54,8 +54,8 @@ PRODUCT_PACKAGES += fastbootd
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/init.recovery.qcom.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.qcom.rc \
     $(DEVICE_PATH)/recovery/root/init.recovery.usb.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.usb.rc \
-    $(DEVICE_PATH)/recovery/root/vendor/bin/mount_vendor_dlkm.sh:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/mount_vendor_dlkm.sh \
-    $(DEVICE_PATH)/recovery/root/vendor/bin/set_branding.sh:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/bin/set_branding.sh
+    $(DEVICE_PATH)/recovery/root/vendor/bin/mount_vendor_dlkm.sh:$(TARGET_COPY_OUT_RECOVERY)/root/sbin/mount_vendor_dlkm.sh \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/set_branding.sh:$(TARGET_COPY_OUT_RECOVERY)/root/sbin/set_branding.sh
 
 # Recovery servicemanager reads HAL declarations from system/etc/vintf.
 PRODUCT_COPY_FILES += \
@@ -65,3 +65,7 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/bin/init_nx733j_hardware.sh:$(TARGET_COPY_OUT_RECOVERY)/root/sbin/init_nx733j_hardware.sh \
     $(DEVICE_PATH)/recovery/root/vendor/firmware/haptic_ram.bin:$(TARGET_COPY_OUT_RECOVERY)/root/vendor/firmware/haptic_ram.bin
+
+# Read-only support report, available before data decryption.
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/nx733j-diagnose.sh:$(TARGET_COPY_OUT_RECOVERY)/root/sbin/nx733j-diagnose.sh

@@ -123,3 +123,21 @@ Se habilitan los ajustes de vibración mediante duration_aw y activate_aw; el HA
 vendor.qti.vibrator permanece deshabilitado. El firmware cargó cuatro efectos y
 el usuario confirmó un pulso directo de 300 ms; uno de 80 ms no fue perceptible.
 Todavía falta verificar la respuesta y duración elegida desde la UI del nuevo build.
+
+## Diagnóstico y claridad de destinos
+
+`adb shell /sbin/sh /sbin/nx733j-diagnose.sh` genera un informe de solo lectura:
+build, slot, USB, batería, ADSP, haptics, CPU, tamaños y mapas. No lee archivos
+personales ni cambia propiedades; puede guardarse redirigiendo la salida en el PC.
+
+El flasheo muestra mount point y dispositivo real antes de comenzar. Los destinos
+fijos tienen nombres como Recovery-A y Recovery-B. El alias Recovery continúa
+usando el slot seleccionado; no se modifica la selección ni el comportamiento A/B.
+
+La temperatura CPU usa el sensor cpuss-0-0 descubierto por nombre, en lugar de
+thermal_zone1, que en este dispositivo era pm8010m_tz (PMIC). El enlace temporal
+lo crea el helper de hardware. Si no existe el sensor, no se sustituye por otro.
+Los helpers de montaje y branding también se ejecutan desde /sbin. Se elimina
+la llamada a odm.prepdecrypt, un servicio inexistente que generaba errores.
+USB/MTP se observó configurado como mtp,adb; no se alteró su configuración ni se
+consideró validada una transferencia MTP real. OTG requiere prueba con hardware.

@@ -1,0 +1,11 @@
+--- a/partition.cpp
++++ b/partition.cpp
+@@ -3187,6 +3187,8 @@
+     std::filesystem::path full_filename = std::filesystem::path(part_settings->Backup_Folder) / Backup_FileName;
+ 
+     LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
++    gui_msg(Msg("nx733j_img_target=Target: {1} ({2})")(Mount_Point)(Actual_Block_Device));
++
+ 
+     if (Is_Super) {
+         if (!Can_Flash_Img || part_settings->adbbackup)

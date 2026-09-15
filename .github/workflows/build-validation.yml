@@ -97,6 +97,9 @@ jobs:
           git apply "$GITHUB_WORKSPACE/.github/patches/nx733j-haptics.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/image-target-message.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/image-target-message.patch"
+          git apply --check "$GITHUB_WORKSPACE/.github/patches/late-cpu-sensor.patch"
+          git apply "$GITHUB_WORKSPACE/.github/patches/late-cpu-sensor.patch"
+          python3 "$GITHUB_WORKSPACE/.github/tests/test-late-cpu-sensor.py" data.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-image-preflight.py" partition.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-logical-image.py" partition.cpp
           echo 'Soporte IMG lógico: controles de OTA, mapeo, capacidad y escritura probados con E/S simulada.' >> "$GITHUB_STEP_SUMMARY"

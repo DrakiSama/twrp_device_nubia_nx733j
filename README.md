@@ -147,3 +147,19 @@ Los helpers de montaje y branding también se ejecutan desde /sbin. Se elimina
 la llamada a odm.prepdecrypt, un servicio inexistente que generaba errores.
 USB/MTP se observó configurado como mtp,adb; no se alteró su configuración ni se
 consideró validada una transferencia MTP real. OTG requiere prueba con hardware.
+
+## Sensor CPU disponible después del inicio
+
+En b8.1-52997c9 batería y vibración funcionan según el usuario. ADB confirmó que
+el enlace /tmp/nx733j-cpu-temp existía y daba 45100 miligrados, pero TWRP había
+fijado tw_no_cpu_temp=1 antes de que el helper creara el enlace.
+
+El parche late-cpu-sensor conserva habilitada la lectura cuando se configura
+TW_CUSTOM_CPU_TEMP_PATH. El lector existente devuelve no disponible hasta que
+el archivo sea legible; no publica una temperatura ficticia ni cambia de sensor.
+Se conserva el intervalo de actualización y se respeta TW_NO_CPU_TEMP explícito.
+La detección del sensor por defecto sin ruta personalizada permanece igual.
+
+La prueba C++ compila las secciones reales de data.cpp con E/S y reloj simulados:
+sensor tardío, fallo y recuperación de lectura, caché, ruta por defecto y exclusión
+explícita. Falta compilar y validar la temperatura visible en un arranque limpio.

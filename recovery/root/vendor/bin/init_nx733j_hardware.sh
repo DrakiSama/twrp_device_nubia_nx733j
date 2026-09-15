@@ -3,13 +3,6 @@
 # qti_battery_charger requires the ADSP firmware to expose battery/USB supplies.
 # Never change firmware selection, load arbitrary modules, or restart a running DSP.
 report() { echo "nx733j-recovery: $*" > /dev/kmsg; }
-# Discover the CPU sensor by type; thermal_zone indices depend on probe order.
-for zone in /sys/class/thermal/thermal_zone*; do
-    [ -r "$zone/type" ] || continue
-    [ "$(cat "$zone/type")" = cpuss-0-0 ] || continue
-    ln -sfn "$zone/temp" /tmp/nx733j-cpu-temp
-    break
-done
 if [ ! -r /firmware/image/adsp.mdt ]; then
     report 'ADSP firmware missing; battery initialization skipped'
     exit 1

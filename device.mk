@@ -69,3 +69,7 @@ PRODUCT_COPY_FILES += \
 # Read-only support report, available before data decryption.
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/recovery/root/vendor/bin/nx733j-diagnose.sh:$(TARGET_COPY_OUT_RECOVERY)/root/sbin/nx733j-diagnose.sh
+
+# Independent bounded CPU sensor discovery; does not wait for ADSP.
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/recovery/root/vendor/bin/init_nx733j_cpu.sh:$(TARGET_COPY_OUT_RECOVERY)/root/sbin/init_nx733j_cpu.sh

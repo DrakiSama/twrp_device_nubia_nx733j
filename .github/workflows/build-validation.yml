@@ -93,6 +93,8 @@ jobs:
           git apply "$GITHUB_WORKSPACE/.github/patches/image-size-preflight.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
+          git apply --check "$GITHUB_WORKSPACE/.github/patches/nx733j-haptics.patch"
+          git apply "$GITHUB_WORKSPACE/.github/patches/nx733j-haptics.patch"
           python3 "$GITHUB_WORKSPACE/.github/tests/test-image-preflight.py" partition.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-logical-image.py" partition.cpp
           echo 'Soporte IMG lógico: controles de OTA, mapeo, capacidad y escritura probados con E/S simulada.' >> "$GITHUB_STEP_SUMMARY"
@@ -139,6 +141,9 @@ jobs:
           cd "$TWRP_ROOT"
           mkdir -p device/nubia/NX733J
           git -C "$GITHUB_WORKSPACE" archive HEAD | tar -x -C device/nubia/NX733J
+          build_label="by Draki b${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}-${GITHUB_SHA:0:7}"
+          printf 'TW_DEVICE_VERSION := %s\n' "$build_label" > device/nubia/NX733J/build-version.mk
+          printf 'Identificación en TWRP: `%s`\n\n' "$build_label" >> "$GITHUB_STEP_SUMMARY"
           source build/envsetup.sh
           lunch twrp_NX733J
           # Use all four hosted-runner CPUs; keep the working Soong memory limit.

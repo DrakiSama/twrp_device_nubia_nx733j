@@ -107,3 +107,19 @@ La siguiente revisión usa un servicio oneshot con PATH y entorno del linker
 explícitos y salida a kmsg. Requiere otra validación en frío; no se considera aún
 resuelta la inicialización automática. Los logs del flasheo a recovery_b muestran
 escritura correcta a /dev/block/sde60; tras flashear ambos slots sus SHA-256 coinciden.
+
+## Identificación y revisión de inicio
+
+Cada ejecución de Actions añade `by Draki b<run_number>.<run_attempt>-<commit>`
+a la versión visible de TWRP, usando un build-version.mk generado antes de lunch.
+Una compilación local sin ese archivo muestra `by Draki local`.
+
+En 91759f2 el servicio fallaba con 127 durante el montaje inicial; el mismo
+servicio iniciado después por ctl.start terminó con RC=0 y recuperó batería.
+El helper ahora se instala y ejecuta desde /sbin, fuera del punto /vendor que
+TWRP monta temporalmente. Sigue pendiente probar esta corrección en arranque frío.
+
+Se habilitan los ajustes de vibración mediante duration_aw y activate_aw; el HAL
+vendor.qti.vibrator permanece deshabilitado. El firmware cargó cuatro efectos y
+el usuario confirmó un pulso directo de 300 ms; uno de 80 ms no fue perceptible.
+Todavía falta verificar la respuesta y duración elegida desde la UI del nuevo build.

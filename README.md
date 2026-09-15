@@ -119,6 +119,12 @@ servicio iniciado después por ctl.start terminó con RC=0 y recuperó batería.
 El helper ahora se instala y ejecuta desde /sbin, fuera del punto /vendor que
 TWRP monta temporalmente. Sigue pendiente probar esta corrección en arranque frío.
 
+El build b7.1-91981b6 reveló que el ramdisk de recovery no incluye /sbin/sh:
+los tres hooks de arranque fallaron y ADSP no inició en frío (sin batería ni
+temperatura en la barra de estado). Los hooks y el diagnóstico invocan ahora
+/system/bin/sh explícitamente, y el workflow verifica antes de publicar que
+todo intérprete referenciado existe en el ramdisk generado.
+
 Se habilitan los ajustes de vibración mediante duration_aw y activate_aw; el HAL
 vendor.qti.vibrator permanece deshabilitado. El firmware cargó cuatro efectos y
 el usuario confirmó un pulso directo de 300 ms; uno de 80 ms no fue perceptible.
@@ -126,7 +132,7 @@ Todavía falta verificar la respuesta y duración elegida desde la UI del nuevo 
 
 ## Diagnóstico y claridad de destinos
 
-`adb shell /sbin/sh /sbin/nx733j-diagnose.sh` genera un informe de solo lectura:
+`adb shell /system/bin/sh /sbin/nx733j-diagnose.sh` genera un informe de solo lectura:
 build, slot, USB, batería, ADSP, haptics, CPU, tamaños y mapas. No lee archivos
 personales ni cambia propiedades; puede guardarse redirigiendo la salida en el PC.
 

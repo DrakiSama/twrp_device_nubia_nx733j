@@ -1,4 +1,4 @@
-#!/vendor/bin/sh
+#!/system/bin/sh
 # set_branding.sh — Agrega "by Draki" al version string de TWRP
 # Se ejecuta después de que TWRP inicializa ro.twrp.version
 

@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/system/bin/sh
 # Read-only support report. No serials, user files, writes, mounts or settings.
 export PATH=/sbin:/system/bin
 echo 'NX733J recovery diagnostics'

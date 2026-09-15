@@ -51,8 +51,8 @@ on boot
 
 # vendor_dlkm mount + módulos + servicios
 on property:twrp.modules.loaded=true
-    exec u:r:recovery:s0 -- /sbin/sh /sbin/mount_vendor_dlkm.sh
-    exec u:r:recovery:s0 -- /sbin/sh /sbin/set_branding.sh
+    exec u:r:recovery:s0 -- /system/bin/sh /sbin/mount_vendor_dlkm.sh
+    exec u:r:recovery:s0 -- /system/bin/sh /sbin/set_branding.sh
     # Firmware modem
     mkdir /firmware
     mount vfat /dev/block/bootdevice/by-name/modem${ro.boot.slot_suffix} /firmware ro
@@ -73,11 +73,12 @@ on property:servicemanager.ready=true
 on post-fs
     # nop
 
-# Keep executable and script in /sbin: mounting stock /vendor must not hide
-# the helper during startup. The early init environment also needs explicit
-# recovery paths also keep command/linker errors visible instead of exit 127
-# from an anonymous exec with discarded stderr.
-service vendor.recovery-hardware /sbin/sh /sbin/init_nx733j_hardware.sh
+# Keep the scripts in /sbin: mounting stock /vendor must not hide them during
+# startup. The recovery ramdisk has no /sbin/sh, so every hook runs the shell
+# at /system/bin/sh explicitly. The service environment keeps explicit recovery
+# paths and stdio_to_kmsg so command/linker errors stay visible instead of an
+# exit 127 from an anonymous exec with discarded stderr.
+service vendor.recovery-hardware /system/bin/sh /sbin/init_nx733j_hardware.sh
     user root
     group root
     disabled

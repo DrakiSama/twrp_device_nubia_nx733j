@@ -159,6 +159,36 @@ jobs:
             printf 'Tamaño: %s bytes\n\n' "$(stat -c %s "$img")"
             printf 'SHA-256: `%s`\n' "$(sha256sum "$img" | cut -d ' ' -f1)"
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify ramdisk interpreters before publishing
+        run: |
+          set -Eeuo pipefail
+          root="$TWRP_ROOT/out/target/product/NX733J/recovery/root"
+          [[ -d "$root" ]] || { echo 'Recovery root not found; build output missing.'; exit 1; }
+          missing=0
+          # Every script shipped by this device tree needs its shebang interpreter.
+          while IFS= read -r script; do
+            shebang=$(head -n1 "$script")
+            [[ "$shebang" == '#!'* ]] || continue
+            interpreter=${shebang:2}
+            interpreter=${interpreter%%[[:space:]]*}
+            if [[ ! -e "$root$interpreter" ]]; then
+              echo "MISSING: $script requires interpreter $interpreter"
+              missing=1
+            fi
+          done < <(find "$GITHUB_WORKSPACE/recovery/root" -type f -name '*.sh')
+          # Every shell path on .rc exec/service lines must exist (comments ignored).
+          while IFS= read -r shell_path; do
+            if [[ ! -e "$root$shell_path" ]]; then
+              echo "MISSING: init .rc references $shell_path"
+              missing=1
+            fi
+          done < <(grep -rhE '^[[:space:]]*(exec|exec_background|exec_start|service)[[:space:]]' \
+            "$GITHUB_WORKSPACE/recovery/root" --include='*.rc' \
+            | grep -oE '/(sbin|system/bin|vendor/bin)/[A-Za-z_]*sh\b' | sort -u)
+          if (( missing == 0 )); then
+            echo 'Intérpretes del ramdisk verificados: todos existen.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit "$missing"
       - name: Upload recovery image only
         uses: actions/upload-artifact@v4
         with:

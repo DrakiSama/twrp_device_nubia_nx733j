@@ -140,7 +140,10 @@ struct PM {
  TWPartition* Find_Partition_By_Path(const std::string&){return &metadata;}
  std::string Get_Active_Slot_Suffix(){return "_b";}
 } PartitionManager;
-namespace TWFunc {uint64_t Get_File_Size(const std::string&){return state.length;}}
+namespace TWFunc {
+uint64_t GetFileSize(const std::filesystem::path&){return state.length;}
+uint64_t Get_File_Size(const std::string&){return state.length;}
+}
 #define AB_OTA_UPDATER
 #define open fake_open
 #define flock fake_flock

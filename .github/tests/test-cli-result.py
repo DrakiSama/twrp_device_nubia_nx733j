@@ -73,13 +73,13 @@ int result=0, copies=1, inserted=1, calls=0, last=-1;
 #define gui_err(...) ((void)0)
 #define gui_msg(...) ((void)0)
 struct TWFunc {
- static std::vector<std::string> Split_String(std::string s, const char*) {
+ static std::vector<std::string> SplitString(std::string s, const char*) {
   std::vector<std::string> v; std::istringstream in(s); std::string x;
   while(in>>x) v.push_back(x);
   return v;
  }
- static std::string get_log_dir(){ return "/tmp"; }
- static bool Path_Exists(std::string){ return false; }
+ static std::string GetLogDir(){ return "/tmp"; }
+ static bool IsPathExists(std::string){ return false; }
 };
 struct DataManager { static int GetValue(std::string, std::string&){ return result; } };
 struct PM { int Decrypt_Device(std::string,int){ return result; } } PartitionManager;

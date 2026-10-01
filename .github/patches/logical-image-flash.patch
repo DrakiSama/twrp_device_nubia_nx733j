@@ -15,7 +15,7 @@ diff --git a/partition.cpp b/partition.cpp
  #include <sys/param.h>
  #include <sys/stat.h>
  #include <sys/types.h>
-@@ -3015,7 +3022,159 @@
+@@ -3015,10 +3022,163 @@
      return maxFileSize - 1;
  }
  
@@ -137,7 +137,12 @@ diff --git a/partition.cpp b/partition.cpp
 +}
 +
 +
++
  bool TWPartition::Flash_Image(PartitionSettings *part_settings) {
+     std::filesystem::path full_filename = std::filesystem::path(part_settings->Backup_Folder) / Backup_FileName;
+ 
+     LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
++
 +    if (Is_Super) {
 +        if (!Can_Flash_Img || part_settings->adbbackup)
 +            return false;
@@ -171,7 +176,6 @@ diff --git a/partition.cpp b/partition.cpp
 +        }
 +        return true;
 +    }
-+
-     std::filesystem::path full_filename = std::filesystem::path(part_settings->Backup_Folder) / Backup_FileName;
  
-     LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
+     if (Backup_Method == BackupMethod::BM_FILES) {
+         gui_err("img_filesystem_unsupported=Direct IMG flashing is not supported for this filesystem partition");

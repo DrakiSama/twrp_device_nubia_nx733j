@@ -105,8 +105,7 @@
  }
 --- a/openrecoveryscript.cpp
 +++ b/openrecoveryscript.cpp
-@@ -97,9 +97,9 @@
- 	}
+@@ -95,7 +95,7 @@
  	return 0;
  }
  
@@ -115,9 +114,7 @@
  	int ret_val = 0, cindex, line_len, i, remove_nl, install_cmd = 0, sideload = 0;
  	char script_line[SCRIPT_COMMAND_SIZE], command[SCRIPT_COMMAND_SIZE],
  	     value[SCRIPT_COMMAND_SIZE], mount[SCRIPT_COMMAND_SIZE],
- 	     value1[SCRIPT_COMMAND_SIZE], value2[SCRIPT_COMMAND_SIZE];
-@@ -449,9 +449,9 @@
- 			strerror(errno)));
+@@ -447,7 +447,7 @@
  		return 1;
  	}
  
@@ -126,76 +123,86 @@
  		ret_val = 1;  // Forces booting to the home page after sideload
  	return ret_val;
  }
- 
-@@ -655,30 +655,31 @@
- 	return op_status;
+@@ -653,58 +653,40 @@
  }
  
  // this is called by the "twcmd" GUI action when a command is received via FIFO from the "twrp" command line tool
 -void OpenRecoveryScript::Run_CLI_Command(const char* command) {
 +int OpenRecoveryScript::Run_CLI_Command(const char* command) {
  	string tmp = command;
- 	std::vector<string> parts =
- 		TWFunc::Split_String(tmp, " ");  // pats[0] is cmd, parts[1...] is args
+-	std::vector<string> parts =
+-		TWFunc::SplitString(tmp, " ");  // pats[0] is cmd, parts[1...] is args
 -	string cmd_str = parts[0];
+-
++	std::vector<string> parts = TWFunc::SplitString(tmp, " ");
 +	string cmd_str = parts.empty() ? "" : parts[0];
 +	int status = 1;
- 
  	if (cmd_str == "runscript") {
  		if (parts.size() > 1) {
  			string filename = parts[1];
- 			if (OpenRecoveryScript::copy_script_file(filename) == 0) {
- 				LOGINFO("Unable to copy script file\n");
- 			} else {
+-			if (OpenRecoveryScript::copy_script_file(filename) == 0) {
+-				LOGINFO("Unable to copy script file\n");
+-			} else {
 -				OpenRecoveryScript::run_script_file();
-+				status = OpenRecoveryScript::run_script_file(true);
- 			}
- 		} else {
- 			LOGINFO("Missing parameter: script file name\n");
- 		}
+-			}
+-		} else {
+-			LOGINFO("Missing parameter: script file name\n");
+-		}
++			if (OpenRecoveryScript::copy_script_file(filename) == 0) LOGINFO("Unable to copy script file\n");
++			else status = OpenRecoveryScript::run_script_file(true);
++		} else LOGINFO("Missing parameter: script file name\n");
  	} else if (cmd_str == "get") {
  		if (parts.size() > 1) {
- 			string varname = parts[1];
- 			string value;
+-			string varname = parts[1];
+-			string value;
 -			DataManager::GetValue(varname, value);
++			string varname = parts[1], value;
 +			status = DataManager::GetValue(varname, value);
  			gui_print("%s = %s\n", varname.c_str(), value.c_str());
- 		} else {
- 			LOGINFO("Missing parameter: var name\n");
- 		}
-@@ -692,23 +693,27 @@
- 			if (parts.size() > 2)
- 				userid = parts[2];
- 
+-		} else {
+-			LOGINFO("Missing parameter: var name\n");
+-		}
++		} else LOGINFO("Missing parameter: var name\n");
+ 	} else if (cmd_str == "decrypt") {
+-		// twrp cmd cannot decrypt a password with space, should decrypt on gui
+-		if (parts.size() == 1) {
+-			gui_err("no_pwd=No password provided.");
+-		} else {
+-			string pass = parts[1];
+-			string userid = "0";
+-			if (parts.size() > 2)
+-				userid = parts[2];
+-
++		if (parts.size() == 1) gui_err("no_pwd=No password provided.");
++		else {
++			string pass = parts[1], userid = "0";
++			if (parts.size() > 2) userid = parts[2];
  			gui_msg("decrypt_cmd=Attempting to decrypt data partition or user data via command line.");
 -			if (PartitionManager.Decrypt_Device(pass, atoi(userid.c_str())) == 0) {
+-				// set_page_done = 1;  // done by singleaction_page anyway
 +			status = PartitionManager.Decrypt_Device(pass, atoi(userid.c_str()));
 +			if (status == 0) {
- 				// set_page_done = 1;  // done by singleaction_page anyway
- 				std::string orsFile = TWFunc::get_log_dir() + "/openrecoveryscript";
- 				if (TWFunc::Path_Exists(orsFile)) {
+ 				std::string orsFile = TWFunc::GetLogDir() + "/openrecoveryscript";
+-				if (TWFunc::IsPathExists(orsFile)) {
 -					Run_OpenRecoveryScript_Action();
-+					status = Run_OpenRecoveryScript_Action();
- 				}
+-				}
++				if (TWFunc::IsPathExists(orsFile)) status = Run_OpenRecoveryScript_Action();
  			}
  		}
 -	} else if (OpenRecoveryScript::Insert_ORS_Command(command)) {
 -		OpenRecoveryScript::run_script_file();
-+	} else if (!cmd_str.empty() && OpenRecoveryScript::Insert_ORS_Command(command)) {
-+		status = OpenRecoveryScript::run_script_file(true);
- 	}
- 
- 	// let the GUI close the output fd and restart the command listener
+-	}
+-
+-	// let the GUI close the output fd and restart the command listener
 -	call_after_cli_command();
++	} else if (!cmd_str.empty() && OpenRecoveryScript::Insert_ORS_Command(command)) status = OpenRecoveryScript::run_script_file(true);
 +	status = status == 0 ? 0 : 1;
-+	if (call_after_cli_command)
-+		call_after_cli_command(status);
++	if (call_after_cli_command) call_after_cli_command(status);
  	LOGINFO("Done reading ORS command from command line\n");
 +	return status;
  }
  
  int OpenRecoveryScript::remountrw(void)
- {
 --- a/openrecoveryscript.hpp
 +++ b/openrecoveryscript.hpp
 @@ -24,23 +24,23 @@

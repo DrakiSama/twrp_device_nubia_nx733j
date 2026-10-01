@@ -1,6 +1,7 @@
+diff --git a/partition.cpp b/partition.cpp
 --- a/partition.cpp
 +++ b/partition.cpp
-@@ -3065,6 +3065,7 @@
+@@ -3021,6 +3021,7 @@
      LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
  
      if (Backup_Method == BackupMethod::BM_FILES) {
@@ -8,18 +9,18 @@
          LOGERR("Cannot flash images to file systems\n");
          return false;
      }
-@@ -3077,6 +3078,10 @@
+@@ -3033,6 +3034,10 @@
          return false;
      }
-     unsigned long long image_size = TWFunc::Get_File_Size(full_filename);
+     unsigned long long image_size = TWFunc::GetFileSize(full_filename);
 +    if (image_size == 0) {
 +        gui_err("img_empty_err=Image is empty or could not be read");
 +        return false;
 +    }
      if (image_size > Size) {
-         LOGINFO("Size (%llu bytes) of image '%s' is larger than target device '%s' (%llu bytes)\n",
+         LOGINFO("Size (%llu bytes) of image '%s' is larger than target device '%s' (%lu bytes)\n",
                  image_size, Backup_FileName.c_str(), Actual_Block_Device.c_str(), Size);
-@@ -3114,10 +3119,6 @@
+@@ -3068,10 +3073,6 @@
  }
  
  bool TWPartition::Flash_Sparse_Image(const std::string &Filename) {
@@ -30,15 +31,14 @@
      gui_msg(Msg("flashing=Flashing {1}...")(Display_Name));
  
      int in = open(Filename.c_str(), O_RDONLY);
-@@ -3130,6 +3131,16 @@
+@@ -3084,6 +3085,15 @@
      if (!s) {
          close(in);
          gui_msg(Msg(msg::kError, "sparse_import_err=Failed to import sparse image '{1}'")(Filename));
 +        return false;
 +    }
 +
-+    // Validate expanded size before opening or discarding the target partition.
-+    // The sparse file on disk can be much smaller than its expanded contents.
++    // Check expanded sparse size before opening or discarding the target.
 +    int64_t expanded_size = sparse_file_len(s, false, false);
 +    if (expanded_size <= 0 || static_cast<uint64_t>(expanded_size) > Size) {
 +        gui_err("sparse_size_err=Expanded sparse image is invalid or larger than target partition");
@@ -47,7 +47,7 @@
          return false;
      }
  
-@@ -3142,6 +3153,9 @@
+@@ -3096,6 +3106,9 @@
          return false;
      }
  

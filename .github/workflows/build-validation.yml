@@ -106,7 +106,9 @@ jobs:
           python3 "$GITHUB_WORKSPACE/.github/tests/test-late-cpu-sensor.py" data.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-image-preflight.py" partition.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-logical-image.py" partition.cpp
+          python3 "$GITHUB_WORKSPACE/.github/tests/test-vbmeta-flags.py"
           echo 'Soporte IMG lógico: controles de OTA, mapeo, capacidad y escritura probados con E/S simulada.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Destinos IMG vbmeta y aliases explícitos A/B verificados en ambas tablas twrp.flags.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Parche del parser twrp.flags aplicado correctamente.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Comprobaciones de tamaño IMG y sparse verificadas antes de escribir.' >> "$GITHUB_STEP_SUMMARY"
       - name: Restore compiler cache

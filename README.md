@@ -41,6 +41,14 @@ La UI muestra mount point y bloque real antes de escribir. Recovery usa el slot
 seleccionado; Recovery-A y Recovery-B identifican destinos fijos. Super continúa
 siendo una entrada generada por TWRP. No confundir modem con datos NV/modemst/fsg.
 
+`vbmeta` y `vbmeta_system` permiten seleccionar IMG para el slot activo; las entradas
+`VBMeta-A/B` y `VBMeta-System-A/B` apuntan explícitamente a cada slot y no aparecen
+como destinos de backup ni wipe. Flashear vbmeta puede cambiar la verificación AVB
+y evitar que Android arranque si la imagen no corresponde al firmware y slot. Esta
+habilitación muestra esos destinos en TWRP, pero no certifica imágenes AVB ni prueba
+su instalación en el teléfono. El workflow comprueba las seis entradas en ambas
+tablas `twrp.flags`.
+
 ## Batería, vibración y temperatura
 
 El servicio vendor.recovery-hardware inicia únicamente el ADSP esperado con

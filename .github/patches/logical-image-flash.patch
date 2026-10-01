@@ -144,7 +144,7 @@ diff --git a/partition.cpp b/partition.cpp
      LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
 +
 +    if (Is_Super) {
-+        if (!Can_Flash_Img || part_settings->adbbackup)
++        if (!Can_Flash_Img)
 +            return false;
 +        auto* metadata = PartitionManager.Find_Partition_By_Path("/metadata");
 +        if (!metadata || !metadata->Is_Mounted()) {

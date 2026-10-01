@@ -119,7 +119,7 @@ struct Msg {template<class... T> Msg(T...){} template<class... T> Msg operator()
 #define LOGINFO(...) ((void)0)
 #define LOGERR(...) ((void)0)
 struct Progress {void UpdateSize(uint64_t){} void UpdateDisplayDetails(bool){}};
-struct PartitionSettings {std::string Backup_Folder="";bool adbbackup=false;Progress* progress=nullptr;};
+struct PartitionSettings {std::string Backup_Folder="";Progress* progress=nullptr;};
 enum class BackupMethod {BM_FILES,BM_DD};
 class TWPartition {
 public:
@@ -191,7 +191,6 @@ int main(){
  run([](auto&,auto&){state.sparse=true;state.import_ok=false;},false);
  run([](auto&,auto&){metadata.mounted=false;},false);
  run([](auto& p,auto&){p.Can_Flash_Img=false;},false);
- run([](auto&,auto& s){s.adbbackup=true;},false);
  run([](auto& p,auto&){p.unmount_ok=false;},false);
  for(auto member:{&State::output_ok,&State::output_same,&State::write_ok,&State::sync_ok})
   run([&](auto&,auto&){state.*member=false;},false,false);

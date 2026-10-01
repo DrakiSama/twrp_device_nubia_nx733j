@@ -8,7 +8,7 @@
 +
  
      if (Is_Super) {
-         if (!Can_Flash_Img || part_settings->adbbackup)
+         if (!Can_Flash_Img)
 --- a/gui/theme/common/languages/en.xml
 +++ b/gui/theme/common/languages/en.xml
 @@ -587,8 +587,9 @@

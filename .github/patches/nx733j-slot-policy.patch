@@ -1,0 +1,39 @@
+diff --git a/gui/action.cpp b/gui/action.cpp
+--- a/gui/action.cpp
++++ b/gui/action.cpp
+@@ -1740,8 +1740,35 @@
+ 	std::string target = DataManager::GetStrValue("tw_flash_partition");
+ 	unsigned int pos = target.find_last_of(';');
+ 	std::string mount_point = pos != std::string::npos ? target.substr(0, pos) : "";
++	if (mount_point == "/vbmeta_b" || mount_point == "/vbmeta_system_b") {
++		gui_err("VBMeta B flashing is disabled; this build preserves slot B as the stock fallback");
++		operation_end(1);
++		return 0;
++	}
++	if (mount_point == "/vbmeta" || mount_point == "/vbmeta_a" ||
++		mount_point == "/vbmeta_system" || mount_point == "/vbmeta_system_a") {
++		if (PartitionManager.Get_Active_Slot_Suffix() != "_a") {
++			gui_err("VBMeta IMG flashing is allowed only while slot A is active");
++			operation_end(1);
++			return 0;
++		}
++		std::string ack_key = path + "/" + filename + "|" + mount_point;
++		if (DataManager::GetStrValue("tw_flash_vbmeta_ack") != ack_key) {
++			gui_err("WARNING: AVB metadata can prevent Android from booting. Verify this exact image matches the device firmware and slot A, then swipe again to continue.");
++			DataManager::SetValue("tw_flash_vbmeta_ack", ack_key);
++			operation_end(1);
++			return 0;
++		}
++		DataManager::SetValue("tw_flash_vbmeta_ack", "");
++	}
+ 	TWPartition* t_part = PartitionManager.Find_Partition_By_Path(mount_point);
+ 	bool flash_in_both_slots = DataManager::GetIntValue("tw_flash_both_slots") ? true : false;
++	if (flash_in_both_slots) {
++		gui_err("Flashing both slots is disabled; this build writes slot A only");
++		DataManager::SetValue("tw_flash_both_slots", 0);
++		operation_end(1);
++		return 0;
++	}
+ 
+ 	if (t_part != NULL && (flash_in_both_slots && t_part->SlotSelect)) 
+ 	{

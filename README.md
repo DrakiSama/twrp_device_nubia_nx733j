@@ -1,20 +1,31 @@
 # TWRP para Nubia Z70 Ultra (NX733J / PQ84A01)
 
-Árbol en depuración para TWRP 16. El usuario confirmó arranque, touch, ADB,
-descifrado con PIN, batería y vibración en el build **b8.1-52997c9**.
-Los cambios posteriores todavía necesitan compilación y validación en el teléfono.
-No se considera validado el flasheo y arranque de cualquier ROM, ZIP u OTA.
+Device tree en desarrollo para TWRP 16. El último build documentado es
+**b16.1-878ad43**, CI run [37139677597](https://github.com/DrakiSama/twrp_device_nubia_nx733j/actions/runs/37139677597),
+imagen `recovery-NX733J-878ad43.img` (104857600 bytes; SHA-256
+`A282838C3CF6FA7F9A85C9E99A9402DBCB1442796FC3405816A7E40B8810827D`). El usuario
+confirmó batería, vibración y temperatura CPU en ese build.
+
+Los cambios de seguridad IMG en esta revisión requieren otra compilación y pruebas
+en el teléfono. No considerar esta revisión una build final ni asumir que instala
+o arranca cualquier ROM, ZIP u OTA.
 
 ## Estado comprobado y pendientes
 
-- Metadata y userdata F2FS: descifrado metadata/FBE con PIN operativo.
+- Metadata y userdata F2FS: descifrado metadata/FBE con PIN operativo en pruebas
+  anteriores; volver a validar el PIN en la build final.
 - Siete particiones lógicas EROFS: system, system_ext, product, vendor, odm,
   vendor_dlkm y system_dlkm. No existe odm_dlkm.
-- Alias de particiones del slot seleccionado y destinos explícitos A/B.
+- Alias de particiones del slot seleccionado y destinos explícitos A/B. La política
+  de IMG nueva exige slot A y rechaza destinos `_b`.
+- La opción “Flash both slots” se rechaza antes de escribir.
+- `/data`, `/metadata` y `/persist` no son destinos IMG ni se pueden borrar desde
+  las opciones de wipe de TWRP en esta política.
 - El usuario instaló recovery.img desde TWRP. Los logs confirmaron escritura de
   recovery_b a /dev/block/sde60 y hashes A/B iguales tras flash both slots.
-- Un ZIP de diagnóstico ejecutó update-binary; otro produjo ERROR 42.
-  Estas pruebas no escribieron imágenes ni validan una OTA payload.bin.
+- Un ZIP de diagnóstico ejecutó update-binary; otro produjo ERROR 42. Estas pruebas
+  no escribieron imágenes ni validan una OTA `payload.bin`. Sideload ZIP no equivale
+  a instalar una OTA moderna basada en `payload.bin`.
 - USB observado como mtp,adb. Transferencia MTP, OTG, fastbootd y backup/restore
   siguen pendientes de pruebas completas.
 - OTG permanece retirado del fstab: la configuración antigua confundía UFS
@@ -23,7 +34,10 @@ No se considera validado el flasheo y arranque de cualquier ROM, ZIP u OTA.
 ## Particiones y flasheo IMG
 
 El fstab de recovery y twrp.flags se mantienen separados del fstab stock Android.
-Las lógicas usan logical,slotselect; no dependen de un número dm-N o de un slot fijo.
+Las lógicas usan logical,slotselect; no dependen de un número dm-N. Para proteger
+el fallback stock B, el escritor IMG exige que A esté activo y comprueba que el
+mapeo corresponda a A. Un ZIP ejecuta su propio instalador; esta guarda IMG no
+controla escrituras que un ZIP realice por su cuenta.
 Grupo qti_dynamic_partitions, super de 17179869184 bytes.
 
 Los parches permiten IMG raw y Android sparse en lógicas EROFS, conservando su
@@ -42,12 +56,13 @@ seleccionado; Recovery-A y Recovery-B identifican destinos fijos. Super continú
 siendo una entrada generada por TWRP. No confundir modem con datos NV/modemst/fsg.
 
 `vbmeta` y `vbmeta_system` permiten seleccionar IMG para el slot activo; las entradas
-`VBMeta-A/B` y `VBMeta-System-A/B` apuntan explícitamente a cada slot y no aparecen
-como destinos de backup ni wipe. Flashear vbmeta puede cambiar la verificación AVB
-y evitar que Android arranque si la imagen no corresponde al firmware y slot. Esta
-habilitación muestra esos destinos en TWRP, pero no certifica imágenes AVB ni prueba
-su instalación en el teléfono. El workflow comprueba las seis entradas en ambas
-tablas `twrp.flags`.
+`VBMeta-A/B` y `VBMeta-System-A/B` son explícitas y no aparecen como destinos de
+backup ni wipe. La interfaz avisa que una imagen AVB incompatible puede impedir
+arrancar Android. El primer intento cancela la operación y muestra la advertencia;
+un segundo swipe confirma el mismo archivo y destino. La confirmación se asocia a
+la ruta, archivo y partición exactos y se consume antes de escribir. Esto no certifica
+que la imagen sea correcta. El workflow comprueba las seis entradas en ambas tablas
+`twrp.flags`. El flash real de `vbmeta_a` sigue pendiente.
 
 ## Batería, vibración y temperatura
 

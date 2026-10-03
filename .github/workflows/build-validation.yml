@@ -93,6 +93,8 @@ jobs:
           git apply "$GITHUB_WORKSPACE/.github/patches/image-size-preflight.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
+          git apply --check "$GITHUB_WORKSPACE/.github/patches/nx733j-slot-policy.patch"
+          git apply "$GITHUB_WORKSPACE/.github/patches/nx733j-slot-policy.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/nx733j-haptics.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/nx733j-haptics.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/image-target-message.patch"
@@ -107,6 +109,7 @@ jobs:
           python3 "$GITHUB_WORKSPACE/.github/tests/test-image-preflight.py" partition.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-logical-image.py" partition.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-vbmeta-flags.py"
+          python3 "$GITHUB_WORKSPACE/.github/tests/test-nx733j-safety.py"
           echo 'Soporte IMG lógico: controles de OTA, mapeo, capacidad y escritura probados con E/S simulada.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Destinos IMG vbmeta y aliases explícitos A/B verificados en ambas tablas twrp.flags.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Parche del parser twrp.flags aplicado correctamente.' >> "$GITHUB_STEP_SUMMARY"

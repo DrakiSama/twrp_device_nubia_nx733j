@@ -33,3 +33,16 @@ Prueba sólo en RAM: ambas políticas aceptaron `schedutil`. Tras ~45 s, con CPU
 ## Validación de build nueva (3 oct 2026, tras reinicio del usuario)
 
 El usuario instaló `recovery-NX733J-878ad43.img`; ADB confirma `3.7.1_16-by Draki b16.1-878ad43`, uptime de 1 min en la primera consulta y servicio `vendor.recovery-cpu=running`. `/tmp/nx733j-cpu-temp` es un archivo regular; su contenido cambió de `50900` a `51300` en seis segundos. `twrp get tw_no_cpu_temp` devuelve 0 y `twrp get tw_cpu_temp` devuelve `50`, confirmando la lectura dinámica desde TWRP en hardware; la barra debería mostrar aproximadamente 50 °C. No se obtuvo imagen de pantalla: `screencap` no está disponible en esta recovery. El governor volvió a `performance` después del reinicio (policy0 3.532 GHz, policy6 4.32 GHz), por lo que la prueba RAM de `schedutil` no es persistente. Temperaturas tras ~1 min: skin 38.9 °C, batería 33 °C, cpuss 52.9/57.4/64.3 °C; CPU ~799% idle. No se puede inferir calentamiento después de >30 min de esta sesión corta.
+
+## Seguridad de instalación IMG (3 oct 2026, nuevo trabajo aún sin build)
+
+El usuario pidió corregir la auditoría del flujo ROM. Cambios locales sin commit todavía:
+
+- `.github/patches/logical-image-flash.patch` exige que el slot activo sea `_a` y rechaza cualquier mount point explícito terminado en `_b` antes de abrir/escribir la imagen. La lógica apunta así a lógicas `_a` y el fallback B queda preservado para IMG.
+- `.github/patches/nx733j-slot-policy.patch` en `GUIAction::flashimage` rechaza `vbmeta_b` y `vbmeta_system_b`, exige slot A para vbmeta y usa confirmación en dos pasos: primer swipe avisa y cancela; segundo swipe permite continuar solo con la misma ruta+archivo+destino. También rechaza “Flash both slots” antes de escribir en cualquiera de los slots y desmarca la opción.
+- Las dos tablas `twrp.flags` marcan `/data`, `/metadata` y `/persist` con `flashimg=0;canbewiped=0;wipeingui=0`. Añadido `.github/tests/test-nx733j-safety.py`, ejecutado por el workflow.
+- README y CHANGELOG ahora describen la política y mantienen explícito que una build nueva y los ensayos físicos siguen pendientes.
+
+Verificación local: la serie de parches del workflow aplica sin conflicto sobre upstream TWRP 16 `58e4cff2c5a21f4b01b5795a16bea59b2eb8dad2`. En WSL pasaron `test-cli-result.py` (36 escenarios), CPU discovery (5), late CPU, image preflight (9), logical IMG (49 casos simulados), vbmeta flags y el test de seguridad. `git diff --check` pasó después de retirar una línea vacía sobrante. Esas pruebas no escribieron el teléfono ni prueban una instalación ROM real.
+
+La rama local `twrp-16.0` contiene cambios sin commit/push; NO uses el build anterior `878ad43` como si incluyera esta política. En la última consulta `adb devices -l` no mostraba dispositivos. No intentes Fastboot OEM: está capado en este teléfono. Próximo paso: revisar diff/estado, ejecutar el workflow GitHub con el nuevo SHA, esperar artefacto y fallo/correcciones de CI antes de probar. Tras instalar desde TWRP, validar en dispositivo: primer/segundo swipe vbmeta, rechazo de destino B, rechazo de “both slots”, escritura controlada de una imagen compatible `product_a`, que `/data` no aparezca borrable en GUI, menú Slot A/B y fastbootd. Preservar `DIAGNOSTICO-2026-09-12.md` y `crdroid_files/`, ambos ajenos a este cambio y sin seguimiento por git.

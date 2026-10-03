@@ -15,7 +15,7 @@ diff --git a/partition.cpp b/partition.cpp
  #include <sys/param.h>
  #include <sys/stat.h>
  #include <sys/types.h>
-@@ -3015,10 +3022,163 @@
+@@ -3015,10 +3022,173 @@
      return maxFileSize - 1;
  }
  
@@ -142,6 +142,16 @@ diff --git a/partition.cpp b/partition.cpp
      std::filesystem::path full_filename = std::filesystem::path(part_settings->Backup_Folder) / Backup_FileName;
  
      LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
++
++    // NX733J ROM images are intentionally restricted to slot A. The generic
++    // fstab aliases resolve to the currently selected slot, so refuse to write
++    // unless A is selected; also reject an explicit B target even when A is active.
++    const std::string active_slot = PartitionManager.Get_Active_Slot_Suffix();
++    if (active_slot != "_a" || (Mount_Point.size() >= 2 &&
++        Mount_Point.compare(Mount_Point.size() - 2, 2, "_b") == 0)) {
++        gui_err("IMG flashing is restricted to slot A; select slot A and an A target");
++        return false;
++    }
 +
 +    if (Is_Super) {
 +        if (!Can_Flash_Img)

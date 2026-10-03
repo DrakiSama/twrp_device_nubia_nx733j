@@ -8,10 +8,9 @@ for property in ro.twrp.version ro.twrp.device.version ro.boot.slot_suffix sys.u
 done
 printf 'Kernel: '; uname -r
 printf 'UTC clock: '; date -u
-printf 'CPU link: '
-if [ -L /tmp/nx733j-cpu-temp ]; then
-    readlink /tmp/nx733j-cpu-temp
-    printf 'CPU linked reading (millidegrees C): '
+printf 'CPU reading: '
+if [ -r /tmp/nx733j-cpu-temp ]; then
+    printf 'CPU published reading (millidegrees C): '
     cat /tmp/nx733j-cpu-temp 2>/dev/null || echo 'unavailable'
 else
     echo 'absent'

@@ -95,7 +95,6 @@ service vendor.recovery-cpu /system/bin/sh /sbin/init_nx733j_cpu.sh
     user root
     group root
     disabled
-    oneshot
     seclabel u:r:recovery:s0
     setenv PATH /sbin:/system/bin
     setenv LD_LIBRARY_PATH /system/lib64:/vendor/lib64/hw

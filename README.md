@@ -64,14 +64,16 @@ SHA-256 e446c67665c16cca99ded8d07a9cc016277a25b5cf0a7203254f8157fddc96ee.
 
 La temperatura usa exclusivamente cpuss-0-0, descubierto por nombre. En b8.1 el
 sensor entregaba valores, pero TWRP había fijado tw_no_cpu_temp=1 antes de que
-apareciera el enlace. late-cpu-sensor.patch conserva la lectura habilitada para
+apareciera el archivo temporal. late-cpu-sensor.patch conserva la lectura habilitada para
 TW_CUSTOM_CPU_TEMP_PATH, respeta TW_NO_CPU_TEMP explícito y mantiene la caché.
 
-El nuevo servicio independiente vendor.recovery-cpu busca el sensor hasta 30
-veces, sin bloquear la UI ni esperar al ADSP. Crea /tmp/nx733j-cpu-temp cuando
-el nodo es legible y termina; si falta, informa el fallo sin usar un sensor PMIC.
-Probado con sysfs simulado y ejecución manual en RAM. Falta validar el servicio
-en un arranque limpio y confirmar la temperatura visible del nuevo build.
+El servicio independiente vendor.recovery-cpu busca el sensor hasta 30 veces,
+sin bloquear la UI ni esperar al ADSP. Publica la lectura de cpuss-0-0 como un
+archivo regular en /tmp/nx733j-cpu-temp cada dos segundos. Esto evita que
+DataManager dependa de permisos para seguir un enlace hacia sysfs. Si falta el
+sensor o falla la publicación, informa el fallo sin sustituirlo por un sensor
+PMIC. La prueba simulada comprueba detección inmediata y tardía, rechazo de
+PMIC, publicación y error de escritura.
 
 ## Resultados de la CLI
 

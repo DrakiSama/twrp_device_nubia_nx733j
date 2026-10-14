@@ -176,7 +176,7 @@ int main(){
  run([](auto& p,auto&){p.Mount_Point="/system_b";state.expected_name="system_b";},true);
  run([](auto& p,auto&){p.Mount_Point="/system_a";state.expected_name="system_a";},true);
  run([](auto&,auto&){state.slot="";},false);
- run([](auto& p,auto&){p.Mount_Point="/boot_b";},false);
+ run([](auto& p,auto&){p.Mount_Point="/boot_b";p.Is_Super=false;},false);
  run([](auto&,auto&){state.sparse=true;},true);assert(state.destroys==1);
  run([](auto&,auto&){state.length=32;},true);
  run([](auto&,auto&){state.ota="none";},true);

@@ -19,7 +19,7 @@ diff --git a/partitionmanager.cpp b/partitionmanager.cpp
  #endif
  
      FstabEntry fstabEntry = {
-@@ -3279,7 +3281,11 @@
+@@ -3279,7 +3281,21 @@
      };
  
      fstab.emplace_back(fstabEntry);
@@ -29,10 +29,22 @@ diff --git a/partitionmanager.cpp b/partitionmanager.cpp
 +        // The active-slot alias may already have created this exact mapper.
 +        fstabEntry.blk_device = mapper_path;
 +    } else if (!fs_mgr_update_logical_partition(&fstabEntry)) {
-         LOGINFO("unable to update logical partition: %s\n", twrpPart->Get_Mount_Point().c_str());
-         return false;
++        const std::string slot_suffix = explicit_slot ? blk_device_partition.substr(blk_device_partition.size() - 2) :
++                PartitionManager.Get_Active_Slot_Suffix();
++        if (slot_suffix != "_a" && slot_suffix != "_b") {
++            LOGINFO("unable to resolve logical partition slot: %s\n", twrpPart->Get_Mount_Point().c_str());
++            return false;
++        }
++        const uint32_t metadata_slot = android::fs_mgr::SlotNumberForSlotSuffix(slot_suffix);
++        if (!android::fs_mgr::CreateLogicalPartition(Get_Super_Partition(), metadata_slot,
++                blk_device_partition, false, std::chrono::milliseconds(1000), &fstabEntry.blk_device)) {
++            LOGINFO("unable to create logical partition mapping: %s\n", twrpPart->Get_Mount_Point().c_str());
++            return false;
++        }
+-        LOGINFO("unable to update logical partition: %s\n", twrpPart->Get_Mount_Point().c_str());
+-        return false;
      }
-@@ -3446,7 +3452,10 @@
+@@ -3446,7 +3462,10 @@
              TWPartition *part = *iter;
              std::string bare_partition_name = Get_Bare_Partition_Name((*iter)->Get_Mount_Point());
              std::string blk_device_partition = bare_partition_name;

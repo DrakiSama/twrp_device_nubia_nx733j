@@ -125,7 +125,7 @@ struct PartitionSettings {std::string Backup_Folder="";Progress* progress=nullpt
 enum class BackupMethod {BM_FILES,BM_DD};
 class TWPartition {
 public:
- bool Is_Super=true, Can_Flash_Img=true, mounted=false, unmount_ok=true;
+ bool Is_Super=true, SlotSelect=true, Can_Flash_Img=true, mounted=false, unmount_ok=true;
  uint64_t Size=32;
  BackupMethod Backup_Method=BackupMethod::BM_FILES;
  std::string Backup_FileName="image.img", Mount_Point="/system_root", Actual_Block_Device="device",Display_Name="System";

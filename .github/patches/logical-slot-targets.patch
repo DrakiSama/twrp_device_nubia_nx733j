@@ -1,0 +1,46 @@
+diff --git a/partitionmanager.cpp b/partitionmanager.cpp
+--- a/partitionmanager.cpp
++++ b/partitionmanager.cpp
+@@ -3264,11 +3264,13 @@
+     Super_Partition_List.push_back(bare_partition_name);
+     LOGINFO("Trying to prepare %s from super partition\n", bare_partition_name.c_str());
+ 
+-    std::string blk_device_partition;
++    std::string blk_device_partition = bare_partition_name;
+ #ifdef AB_OTA_UPDATER
+-    blk_device_partition = bare_partition_name + PartitionManager.Get_Active_Slot_Suffix();
+-#else
+-    blk_device_partition = bare_partition_name;
++    const bool explicit_slot = bare_partition_name.size() >= 2 &&
++        (bare_partition_name.compare(bare_partition_name.size() - 2, 2, "_a") == 0 ||
++         bare_partition_name.compare(bare_partition_name.size() - 2, 2, "_b") == 0);
++    if (!explicit_slot)
++        blk_device_partition += PartitionManager.Get_Active_Slot_Suffix();
+ #endif
+ 
+     FstabEntry fstabEntry = {
+@@ -3279,7 +3281,11 @@
+     };
+ 
+     fstab.emplace_back(fstabEntry);
+-    if (!fs_mgr_update_logical_partition(&fstabEntry)) {
++    const std::string mapper_path = std::format("/dev/block/mapper/{}", blk_device_partition);
++    if (access(mapper_path.c_str(), F_OK) == 0) {
++        // The active-slot alias may already have created this exact mapper.
++        fstabEntry.blk_device = mapper_path;
++    } else if (!fs_mgr_update_logical_partition(&fstabEntry)) {
+         LOGINFO("unable to update logical partition: %s\n", twrpPart->Get_Mount_Point().c_str());
+         return false;
+     }
+@@ -3446,7 +3452,10 @@
+             TWPartition *part = *iter;
+             std::string bare_partition_name = Get_Bare_Partition_Name((*iter)->Get_Mount_Point());
+             std::string blk_device_partition = bare_partition_name;
+-            if (DataManager::GetStrValue("tw_has_boot_slots") == "1")
++            const bool explicit_slot = bare_partition_name.size() >= 2 &&
++                (bare_partition_name.compare(bare_partition_name.size() - 2, 2, "_a") == 0 ||
++                 bare_partition_name.compare(bare_partition_name.size() - 2, 2, "_b") == 0);
++            if (!explicit_slot && DataManager::GetStrValue("tw_has_boot_slots") == "1")
+                 blk_device_partition.append(PartitionManager.Get_Active_Slot_Suffix());
+             (*iter)->UnMount(false);
+             LOGINFO("removing dynamic partition: %s\n", blk_device_partition.c_str());

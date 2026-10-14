@@ -1,17 +1,19 @@
 # Changelog — TWRP device tree for Nubia Z70 Ultra (NX733J)
 
-## [2026-10-03] — IMG slot and wipe safety (build pending)
+## [2026-10-13] — IMG slot targeting and updater shell compatibility (build pending)
 
-- IMG flashing now fails closed unless slot A is active; explicit `_b` image targets
-  are rejected before opening the destination for writing.
-- The “Flash both slots” action is rejected before either slot is written, avoiding
-  a partial A-only flash followed by a failed B write.
+- IMG flashing exposes explicit A/B targets for physical partitions and all seven
+  logical partitions; writing the active slot warns and continues.
+- Logical partitions are mapped by their explicit slot name without changing the
+  boot slot. OTA/snapshot, mapping, capacity and write protections remain enabled.
+- “Flash both slots” is blocked for active-slot aliases; choose one explicit A/B
+  target per operation.
 - `/data`, `/metadata` and `/persist` have image flashing and GUI wiping disabled.
-- IMG vbmeta/vbmeta_system A targets require a two-step confirmation tied to the
-  exact image and target, with an AVB boot warning. This does not verify image
-  contents; the real `vbmeta_a` write remains a device test.
-- CI adds slot-policy, wipe-policy and vbmeta-warning checks. A clean build and
-  hardware tests are still required; this source change is not yet a release build.
+- Active-slot warnings also apply to vbmeta. They do not verify image contents.
+- Recovery init creates `/sbin/sh` as an alias to `/system/bin/sh` for legacy ZIP
+  updater scripts. CI checks that the alias exists in the built ramdisk.
+- A clean build and hardware tests are still required; this source change is not
+  yet a release build.
 
 ## [2026-05-15] — Full optimization pass
 

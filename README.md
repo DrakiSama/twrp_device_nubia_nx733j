@@ -16,9 +16,11 @@ o arranca cualquier ROM, ZIP u OTA.
   anteriores; volver a validar el PIN en la build final.
 - Siete particiones lógicas EROFS: system, system_ext, product, vendor, odm,
   vendor_dlkm y system_dlkm. No existe odm_dlkm.
-- Alias de particiones del slot seleccionado y destinos explícitos A/B. La política
-  de IMG nueva exige slot A y rechaza destinos `_b`.
-- La opción “Flash both slots” se rechaza antes de escribir.
+- Alias de particiones del slot seleccionado y destinos explícitos A/B para
+  particiones físicas y las siete lógicas. El slot activo muestra una advertencia
+  y permite continuar; cada destino se escribe por su mapeo de bloque real.
+- “Flash both slots” se bloquea para aliases que resuelven dinámicamente el slot;
+  se elige A o B como destino IMG explícito para evitar cambiar el slot de arranque.
 - `/data`, `/metadata` y `/persist` no son destinos IMG ni se pueden borrar desde
   las opciones de wipe de TWRP en esta política.
 - El usuario instaló recovery.img desde TWRP. Los logs confirmaron escritura de
@@ -34,10 +36,11 @@ o arranca cualquier ROM, ZIP u OTA.
 ## Particiones y flasheo IMG
 
 El fstab de recovery y twrp.flags se mantienen separados del fstab stock Android.
-Las lógicas usan logical,slotselect; no dependen de un número dm-N. Para proteger
-el fallback stock B, el escritor IMG exige que A esté activo y comprueba que el
-mapeo corresponda a A. Un ZIP ejecuta su propio instalador; esta guarda IMG no
-controla escrituras que un ZIP realice por su cuenta.
+Los aliases lógicos usan logical,slotselect; las entradas explícitas `_a` y `_b`
+usan logical sin slotselect. TWRP mapea cada nombre desde metadata de super y
+comprueba que el dispositivo seleccionado sea lineal sobre super. No cambia el
+slot de arranque para escribir el inactivo. Un ZIP ejecuta su propio instalador;
+esta validación IMG no controla escrituras que un ZIP realice por su cuenta.
 Grupo qti_dynamic_partitions, super de 17179869184 bytes.
 
 Los parches permiten IMG raw y Android sparse en lógicas EROFS, conservando su
@@ -51,18 +54,22 @@ destino ocupado. La ruta lógica no usa BLKDISCARD ni crea/trunca archivos de
 destino; comprueba errores y fsync. No redimensiona super, fusiona snapshots,
 cambia AVB ni selecciona otro slot.
 
-La UI muestra mount point y bloque real antes de escribir. Recovery usa el slot
-seleccionado; Recovery-A y Recovery-B identifican destinos fijos. Super continúa
-siendo una entrada generada por TWRP. No confundir modem con datos NV/modemst/fsg.
+La imagen cruda de `/super` se rechaza porque no corresponde a un slot y puede
+reemplazar metadata y ambos slots a la vez. Para actualizar una partición dinámica,
+elige su destino lógico A/B explícito.
+
+La UI muestra mount point y bloque real antes de escribir, y advierte si el destino
+es el slot activo sin exigir doble confirmación. Recovery usa el slot seleccionado;
+Recovery-A y Recovery-B identifican destinos fijos. Las imágenes de boot, vbmeta y
+particiones lógicas ofrecen targets A/B. Super continúa siendo una entrada generada
+por TWRP. No confundir modem con datos NV/modemst/fsg.
 
 `vbmeta` y `vbmeta_system` permiten seleccionar IMG para el slot activo; las entradas
 `VBMeta-A/B` y `VBMeta-System-A/B` son explícitas y no aparecen como destinos de
-backup ni wipe. La interfaz avisa que una imagen AVB incompatible puede impedir
-arrancar Android. El primer intento cancela la operación y muestra la advertencia;
-un segundo swipe confirma el mismo archivo y destino. La confirmación se asocia a
-la ruta, archivo y partición exactos y se consume antes de escribir. Esto no certifica
-que la imagen sea correcta. El workflow comprueba las seis entradas en ambas tablas
-`twrp.flags`. El flash real de `vbmeta_a` sigue pendiente.
+backup ni wipe. La advertencia de slot activo también aplica a AVB; la advertencia
+no certifica que la imagen sea correcta. El workflow verifica las dos tablas
+`twrp.flags`. El flash en teléfono de las nuevas entradas A/B queda pendiente de
+prueba después de compilar y revisar los logs.
 
 ## Batería, vibración y temperatura
 
@@ -139,7 +146,8 @@ generado muestra by Draki local. No se inicia Actions al subir un commit.
 
 Antes del upload se verifica tamaño máximo de recovery (104857600 bytes) y
 presencia de los intérpretes usados por los scripts/hooks dentro del ramdisk.
-Todos los hooks usan /system/bin/sh: este ramdisk no trae /sbin/sh.
+Los hooks usan /system/bin/sh y init crea /sbin/sh como alias para scripts de
+actualización ZIP antiguos que esperan ese shebang.
 Los scripts se instalan en /sbin para que montar vendor no los oculte.
 
 Manifest: https://github.com/TWRP-Test/platform_manifest_twrp_aosp, rama twrp-16.0.

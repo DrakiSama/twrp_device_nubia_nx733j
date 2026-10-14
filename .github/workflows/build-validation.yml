@@ -93,6 +93,8 @@ jobs:
           git apply "$GITHUB_WORKSPACE/.github/patches/image-size-preflight.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/logical-image-flash.patch"
+          git apply --check "$GITHUB_WORKSPACE/.github/patches/logical-slot-targets.patch"
+          git apply "$GITHUB_WORKSPACE/.github/patches/logical-slot-targets.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/nx733j-slot-policy.patch"
           git apply "$GITHUB_WORKSPACE/.github/patches/nx733j-slot-policy.patch"
           git apply --check "$GITHUB_WORKSPACE/.github/patches/nx733j-haptics.patch"
@@ -110,7 +112,7 @@ jobs:
           python3 "$GITHUB_WORKSPACE/.github/tests/test-logical-image.py" partition.cpp
           python3 "$GITHUB_WORKSPACE/.github/tests/test-vbmeta-flags.py"
           python3 "$GITHUB_WORKSPACE/.github/tests/test-nx733j-safety.py"
-          echo 'Soporte IMG lógico: controles de OTA, mapeo, capacidad y escritura probados con E/S simulada.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Soporte IMG lógico: controles de OTA, mapeo, capacidad y escritura comprobados con E/S simulada.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Destinos IMG vbmeta y aliases explícitos A/B verificados en ambas tablas twrp.flags.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Parche del parser twrp.flags aplicado correctamente.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Comprobaciones de tamaño IMG y sparse verificadas antes de escribir.' >> "$GITHUB_STEP_SUMMARY"
@@ -177,6 +179,11 @@ jobs:
           root="$TWRP_ROOT/out/target/product/NX733J/recovery/root"
           [[ -d "$root" ]] || { echo 'Recovery root not found; build output missing.'; exit 1; }
           missing=0
+          if ! grep -Eq '^[[:space:]]*symlink[[:space:]]+/system/bin/sh[[:space:]]+/sbin/sh[[:space:]]*$' \
+            "$GITHUB_WORKSPACE/recovery/root/init.recovery.qcom.rc" || [[ ! -x "$root/sbin/sh" ]]; then
+            echo 'MISSING: legacy updater-binary shell alias /sbin/sh'
+            missing=1
+          fi
           # Every script shipped by this device tree needs its shebang interpreter.
           while IFS= read -r script; do
             shebang=$(head -n1 "$script")

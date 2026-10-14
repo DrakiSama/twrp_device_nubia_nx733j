@@ -6,24 +6,28 @@
      if (Is_Super) {
 --- a/gui/theme/common/languages/en.xml
 +++ b/gui/theme/common/languages/en.xml
-@@ -587,8 +587,9 @@
+@@ -587,8 +587,11 @@
  		<string name="mtp_fail">Failed to enable MTP</string>
  		<string name="no_mtp">MTP support not included</string>
  		<string name="image_flash_start">[IMAGE FLASH STARTED]</string>
  		<string name="img_to_flash">Image to flash: '{1}'</string>
 +		<string name="nx733j_img_target">Target: {1} ({2})</string>
++		<string name="nx733j_active_slot_warning">WARNING: this image targets the active slot. An incompatible image can prevent Android from booting.</string>
++		<string name="nx733j_flash_one_slot">Flashing only the selected slot. Choose the other A/B target separately if needed.</string>
  		<string name="flash_unable_locate">Unable to locate '{1}' partition for flashing.</string>
  		<string name="no_part_flash">No partitions selected for flashing.</string>
  		<string name="too_many_flash">Too many partitions selected for flashing.</string>
  		<string name="invalid_flash">Invalid flash partition specified.</string>
 --- a/gui/theme/common/languages/es.xml
 +++ b/gui/theme/common/languages/es.xml
-@@ -515,8 +515,9 @@
+@@ -515,8 +515,11 @@
  		<string name="mtp_fail">Error al activar MTP</string>
  		<string name="no_mtp">Soporte a MTP no incluido</string>
  		<string name="image_flash_start">[FLASHEO DE IMAGEN EMPEZADA]</string>
  		<string name="img_to_flash">Imagen a flashear: \'{1}\'</string>
 +		<string name="nx733j_img_target">Destino: {1} ({2})</string>
++		<string name="nx733j_active_slot_warning">ADVERTENCIA: esta imagen se escribirá en el slot activo. Una imagen incompatible puede impedir que Android arranque.</string>
++		<string name="nx733j_flash_one_slot">Se flasheará solo el slot seleccionado. Elige el otro destino A/B por separado si hace falta.</string>
  		<string name="flash_unable_locate">Incapaz de localizar la partición \'{1}\' para flashear.</string>
  		<string name="no_part_flash">No se ha seleccionado partición para flashear.</string>
  		<string name="too_many_flash">Demasiadas particiones seleccionadas para flashear.</string>

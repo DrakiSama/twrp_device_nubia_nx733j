@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""Fail closed if the NX733J slot-A and no-wipe policies drift."""
+"""Check NX733J IMG slot targeting and no-wipe policies."""
 from pathlib import Path
 import sys
 
 root = Path(__file__).resolve().parents[2]
-tables = [
-    root / "recovery/root/twrp.flags",
-    root / "recovery/root/system/etc/twrp.flags",
-]
+tables = [root / "recovery/root/twrp.flags", root / "recovery/root/system/etc/twrp.flags"]
 expected_data = "/data f2fs /dev/block/by-name/userdata flags=backup=1;flashimg=0;canbewiped=0;wipeingui=0;storage"
+logical_names = ("system", "system_ext", "product", "vendor", "odm", "vendor_dlkm", "system_dlkm")
+
 for table in tables:
     lines = table.read_text(encoding="utf-8").splitlines()
     for path in ("/data", "/metadata", "/persist"):
@@ -19,26 +18,28 @@ for table in tables:
     if next(line for line in lines if line.startswith("/data ")) != expected_data:
         print(f"Unexpected userdata policy in {table}", file=sys.stderr)
         raise SystemExit(1)
+    for name in logical_names:
+        for slot in ("a", "b"):
+            row = f"/{name}_{slot} "
+            if not any(line.startswith(row) and "flashimg=1" in line for line in lines):
+                print(f"Missing logical IMG target {row.strip()} in {table}", file=sys.stderr)
+                raise SystemExit(1)
 
 logical_patch = (root / ".github/patches/logical-image-flash.patch").read_text(encoding="utf-8")
-if 'active_slot != "_a"' not in logical_patch or 'compare(Mount_Point.size() - 2, 2, "_b")' not in logical_patch:
-    print("IMG slot-A fail-closed guard is missing", file=sys.stderr)
+slot_target_patch = (root / ".github/patches/logical-slot-targets.patch").read_text(encoding="utf-8")
+if ("nx733j_active_slot_warning" not in logical_patch or "if (!explicit_slot)" not in logical_patch
+        or 'Mount_Point == "/super"' not in logical_patch):
+    print("Active-slot warning, logical target selection, or raw-super protection is missing", file=sys.stderr)
     raise SystemExit(1)
-
-warning_patch = (root / ".github/patches/nx733j-slot-policy.patch").read_text(encoding="utf-8")
-for token in ("/vbmeta_a", "/vbmeta_system_a", "WARNING: AVB metadata", "matches the device firmware and slot A"):
-    if token not in warning_patch:
-        print(f"Missing vbmeta warning behavior: {token}", file=sys.stderr)
+for token in ("/dev/block/mapper/{}", "explicit_slot", "Get_Active_Slot_Suffix()"):
+    if token not in slot_target_patch:
+        print(f"Missing explicit logical slot mapping behavior: {token}", file=sys.stderr)
         raise SystemExit(1)
 
-slot_policy = warning_patch
-for token in ("flash_in_both_slots", "Flashing both slots is disabled", "operation_end(1)"):
+slot_policy = (root / ".github/patches/nx733j-slot-policy.patch").read_text(encoding="utf-8")
+for token in ("flash_in_both_slots", "explicit A or B image target", "operation_end(1)"):
     if token not in slot_policy:
         print(f"Missing pre-write slot policy: {token}", file=sys.stderr)
         raise SystemExit(1)
-for token in ("tw_flash_vbmeta_ack", "swipe again to continue", "Get_Active_Slot_Suffix() != \"_a\""):
-    if token not in slot_policy:
-        print(f"Missing two-step VBMeta confirmation: {token}", file=sys.stderr)
-        raise SystemExit(1)
 
-print("Both flag tables protect userdata/metadata/persist; IMG writes are slot-A-only; vbmeta A targets show a warning.")
+print("Protected partitions remain non-flashable; physical and logical A/B IMG targets are available; active-slot writes warn.")

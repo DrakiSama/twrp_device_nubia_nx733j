@@ -9,6 +9,20 @@ vendor /vendor erofs ro wait,slotselect,logical
 odm /odm erofs ro wait,slotselect,logical
 vendor_dlkm /vendor_dlkm erofs ro wait,slotselect,logical
 system_dlkm /system_dlkm erofs ro wait,slotselect,logical
+system_a /system_a erofs ro wait,logical
+system_b /system_b erofs ro wait,logical
+system_ext_a /system_ext_a erofs ro wait,logical
+system_ext_b /system_ext_b erofs ro wait,logical
+product_a /product_a erofs ro wait,logical
+product_b /product_b erofs ro wait,logical
+vendor_a /vendor_a erofs ro wait,logical
+vendor_b /vendor_b erofs ro wait,logical
+odm_a /odm_a erofs ro wait,logical
+odm_b /odm_b erofs ro wait,logical
+vendor_dlkm_a /vendor_dlkm_a erofs ro wait,logical
+vendor_dlkm_b /vendor_dlkm_b erofs ro wait,logical
+system_dlkm_a /system_dlkm_a erofs ro wait,logical
+system_dlkm_b /system_dlkm_b erofs ro wait,logical
 
 # Physical images: active-slot aliases and explicit slots.
 /dev/block/by-name/boot /boot emmc defaults slotselect

@@ -28,6 +28,7 @@
 on init
     start vendor.boot-qti
     setprop prepdecrypt.setpatch true
+    symlink /system/bin/sh /sbin/sh
 
 on early-fs
     write /proc/sys/walt/sched_lib_name "recovery,magiskboot,Updater,updater,update_engine_sideload"

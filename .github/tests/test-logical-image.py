@@ -38,6 +38,7 @@ struct State {
  int64_t length=16, expanded=16;
  uint64_t capacity=32;
  std::string ota="", type="linear", slot="_a";
+ std::string expected_name="system_a";
  int writes=0, output_opens=0, destroys=0, syncs=0, reads=0, lock_held=0;
 } state;
 int fake_open(const char* path, int flags) {
@@ -100,7 +101,7 @@ namespace android { namespace base {
  public:
   struct TargetInfo {struct {char target_type[32];} spec; std::string data;};
   static DeviceMapper& Instance(){static DeviceMapper dm;return dm;}
-  bool GetDmDevicePathByName(const std::string& name,std::string* path){assert(name=="system_a");*path="mapped";return state.map_ok;}
+  bool GetDmDevicePathByName(const std::string& name,std::string* path){assert(name==state.expected_name);*path="mapped";return state.map_ok;}
   bool GetTableInfo(const std::string&,std::vector<TargetInfo>* table){
    TargetInfo t{};strcpy(t.spec.target_type,state.type.c_str());t.data=state.direct ? "8:7 123" : "253:4 123";
    table->push_back(t);return state.table_ok;
@@ -114,6 +115,7 @@ int64_t sparse_file_len(sparse_file*,bool,bool){return state.expanded;}
 void sparse_file_destroy(sparse_file*){++state.destroys;}
 int sparse_file_write(sparse_file*,int,bool,bool,bool){++state.writes;return state.write_ok ? 0 : -1;}
 struct Msg {template<class... T> Msg(T...){} template<class... T> Msg operator()(T...){return *this;}};
+namespace msg { constexpr int kWarning = 1; }
 #define gui_err(...) ((void)0)
 #define gui_msg(...) ((void)0)
 #define LOGINFO(...) ((void)0)
@@ -170,7 +172,9 @@ int main(){
  };
  run([](auto&,auto&){},true);
  assert(state.writes==1 && state.syncs==1);
- run([](auto&,auto&){state.slot="_b";},false);
+ run([](auto&,auto&){state.slot="_b";state.expected_name="system_b";},true);
+ run([](auto& p,auto&){p.Mount_Point="/system_b";state.expected_name="system_b";},true);
+ run([](auto& p,auto&){p.Mount_Point="/system_a";state.expected_name="system_a";},true);
  run([](auto&,auto&){state.slot="";},false);
  run([](auto& p,auto&){p.Mount_Point="/boot_b";},false);
  run([](auto&,auto&){state.sparse=true;},true);assert(state.destroys==1);

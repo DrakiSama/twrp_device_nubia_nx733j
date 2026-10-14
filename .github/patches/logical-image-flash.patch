@@ -15,7 +15,7 @@ diff --git a/partition.cpp b/partition.cpp
  #include <sys/param.h>
  #include <sys/stat.h>
  #include <sys/types.h>
-@@ -3015,10 +3022,173 @@
+@@ -3015,10 +3022,185 @@
      return maxFileSize - 1;
  }
  
@@ -143,15 +143,24 @@ diff --git a/partition.cpp b/partition.cpp
  
      LOGINFO("Image filename is: %s\n", Backup_FileName.c_str());
 +
-+    // NX733J ROM images are intentionally restricted to slot A. The generic
-+    // fstab aliases resolve to the currently selected slot, so refuse to write
-+    // unless A is selected; also reject an explicit B target even when A is active.
-+    const std::string active_slot = PartitionManager.Get_Active_Slot_Suffix();
-+    if (active_slot != "_a" || (Mount_Point.size() >= 2 &&
-+        Mount_Point.compare(Mount_Point.size() - 2, 2, "_b") == 0)) {
-+        gui_err("IMG flashing is restricted to slot A; select slot A and an A target");
++    // Raw super is not a slot-specific target and can replace both slots' metadata.
++    if (Mount_Point == "/super") {
++        gui_err("Raw super.img flashing is disabled; choose an explicit logical A/B target");
 +        return false;
 +    }
++
++    // Explicit A/B entries target their named slot. Generic aliases resolve
++    // to the active slot. Warn before writing active-slot images but allow them.
++    const std::string active_slot = PartitionManager.Get_Active_Slot_Suffix();
++    std::string target_slot;
++    if (Mount_Point.size() >= 2 &&
++        (Mount_Point.compare(Mount_Point.size() - 2, 2, "_a") == 0 ||
++         Mount_Point.compare(Mount_Point.size() - 2, 2, "_b") == 0))
++        target_slot = Mount_Point.substr(Mount_Point.size() - 2);
++    else if (SlotSelect)
++        target_slot = active_slot;
++    if (!target_slot.empty() && target_slot == active_slot)
++        gui_msg(Msg(msg::kWarning, "nx733j_active_slot_warning=WARNING: this image targets the active slot. An incompatible image can prevent Android from booting."));
 +
 +    if (Is_Super) {
 +        if (!Can_Flash_Img)
@@ -168,7 +177,10 @@ diff --git a/partition.cpp b/partition.cpp
 +        }
 +        std::string name = Mount_Point == "/system_root" ? "system" : Mount_Point.substr(1);
 +#ifdef AB_OTA_UPDATER
-+        name += PartitionManager.Get_Active_Slot_Suffix();
++        const bool explicit_slot = name.size() >= 2 &&
++            (name.compare(name.size() - 2, 2, "_a") == 0 || name.compare(name.size() - 2, 2, "_b") == 0);
++        if (!explicit_slot)
++            name += active_slot;
 +#endif
 +        if (!CheckLogicalImageMapping(name, Actual_Block_Device)) {
 +            gui_err("logical_img_mapping=Target is not the selected slot's direct linear mapping on super");

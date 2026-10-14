@@ -15,7 +15,7 @@ diff --git a/partition.cpp b/partition.cpp
  #include <sys/param.h>
  #include <sys/stat.h>
  #include <sys/types.h>
-@@ -3015,10 +3022,185 @@
+@@ -3015,10 +3022,189 @@
      return maxFileSize - 1;
  }
  
@@ -179,6 +179,10 @@ diff --git a/partition.cpp b/partition.cpp
 +#ifdef AB_OTA_UPDATER
 +        const bool explicit_slot = name.size() >= 2 &&
 +            (name.compare(name.size() - 2, 2, "_a") == 0 || name.compare(name.size() - 2, 2, "_b") == 0);
++        if (!explicit_slot && active_slot != "_a" && active_slot != "_b") {
++            gui_err("logical_img_slot=Active slot is unknown; choose an explicit A/B target");
++            return false;
++        }
 +        if (!explicit_slot)
 +            name += active_slot;
 +#endif

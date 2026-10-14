@@ -180,8 +180,8 @@ jobs:
           [[ -d "$root" ]] || { echo 'Recovery root not found; build output missing.'; exit 1; }
           missing=0
           if ! grep -Eq '^[[:space:]]*symlink[[:space:]]+/system/bin/sh[[:space:]]+/sbin/sh[[:space:]]*$' \
-            "$GITHUB_WORKSPACE/recovery/root/init.recovery.qcom.rc" || [[ ! -x "$root/sbin/sh" ]]; then
-            echo 'MISSING: legacy updater-binary shell alias /sbin/sh'
+            "$GITHUB_WORKSPACE/recovery/root/init.recovery.qcom.rc" || [[ ! -x "$root/system/bin/sh" ]]; then
+            echo 'MISSING: legacy updater-binary shell alias configuration or /system/bin/sh interpreter'
             missing=1
           fi
           # Every script shipped by this device tree needs its shebang interpreter.

@@ -19,7 +19,7 @@ diff --git a/partitionmanager.cpp b/partitionmanager.cpp
  #endif
  
      FstabEntry fstabEntry = {
-@@ -3279,7 +3281,21 @@
+@@ -3279,7 +3281,26 @@
      };
  
      fstab.emplace_back(fstabEntry);
@@ -36,15 +36,20 @@ diff --git a/partitionmanager.cpp b/partitionmanager.cpp
 +            return false;
 +        }
 +        const uint32_t metadata_slot = android::fs_mgr::SlotNumberForSlotSuffix(slot_suffix);
-+        if (!android::fs_mgr::CreateLogicalPartition(Get_Super_Partition(), metadata_slot,
-+                blk_device_partition, false, std::chrono::milliseconds(1000), &fstabEntry.blk_device)) {
++        android::fs_mgr::CreateLogicalPartitionParams params;
++        params.block_device = Get_Super_Partition();
++        params.metadata_slot = metadata_slot;
++        params.partition_name = blk_device_partition;
++        params.force_writable = false;
++        params.timeout_ms = std::chrono::milliseconds(1000);
++        if (!android::fs_mgr::CreateLogicalPartition(params, &fstabEntry.blk_device)) {
 +            LOGINFO("unable to create logical partition mapping: %s\n", twrpPart->Get_Mount_Point().c_str());
 +            return false;
 +        }
 -        LOGINFO("unable to update logical partition: %s\n", twrpPart->Get_Mount_Point().c_str());
 -        return false;
      }
-@@ -3446,7 +3462,10 @@
+@@ -3446,7 +3467,10 @@
              TWPartition *part = *iter;
              std::string bare_partition_name = Get_Bare_Partition_Name((*iter)->Get_Mount_Point());
              std::string blk_device_partition = bare_partition_name;
